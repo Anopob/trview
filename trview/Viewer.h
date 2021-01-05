@@ -136,6 +136,7 @@ namespace trview
         std::unique_ptr<TriggersWindowManager> _triggers_windows;
         std::unique_ptr<RoomsWindowManager> _rooms_windows;
         std::unique_ptr<Level> _level;
+        std::unique_ptr<Level> _compare_level;
         Window _window;
         Timer _timer;
         OrbitCamera _camera;
