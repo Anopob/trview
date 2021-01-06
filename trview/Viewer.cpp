@@ -627,6 +627,22 @@ namespace trview
         _scene_changed = true;
     }
 
+    void Viewer::open_diff(const std::string& filename)
+    {
+        std::unique_ptr<trlevel::ILevel> new_level;
+        try
+        {
+            new_level = trlevel::load_level(filename);
+        }
+        catch (...)
+        {
+            MessageBox(_window.window(), L"Failed to load level", L"Error", MB_OK);
+            return;
+        }
+
+        _compare_level = std::make_unique<Level>(_device, *_shader_storage.get(), std::move(new_level), *_type_name_lookup);
+    }
+
     void Viewer::render()
     {
         // If minimised, don't render like crazy. Sleep so we don't hammer the CPU either.
@@ -1166,6 +1182,9 @@ namespace trview
         lua_pushcfunction(state, lua_open);
         lua_setfield(state, -2, "open");
 
+        lua_pushcfunction(state, lua_open_diff);
+        lua_setfield(state, -2, "opendiff");
+
         lua_pushcfunction(state, lua_open_recent);
         lua_setfield(state, -2, "openRecent");
 
@@ -1178,6 +1197,14 @@ namespace trview
         auto viewer = (*reinterpret_cast<Viewer**>(luaL_checkudata(state, 1, "trview.mt")));
         auto filename = lua_tostring(state, 2);
         viewer->open(filename);
+        return 0;
+    }
+
+    int Viewer::lua_open_diff(lua_State* state)
+    {
+        auto viewer = (*reinterpret_cast<Viewer**>(luaL_checkudata(state, 1, "trview.mt")));
+        auto filename = lua_tostring(state, 2);
+        viewer->open_diff(filename);
         return 0;
     }
 

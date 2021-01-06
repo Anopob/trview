@@ -74,6 +74,10 @@ namespace trview
         /// @param filename The level file to open.
         void open(const std::string& filename);
 
+        /// Attempt to open the specified level file as the diff level.
+        /// @param filename The level file to open.
+        void open_diff(const std::string& filename);
+
         /// Get the current user settings.
         /// @returns The current settings.
         UserSettings settings() const;
@@ -125,6 +129,7 @@ namespace trview
 
         void register_lua();
         static int lua_open(lua_State* state);
+        static int lua_open_diff(lua_State* state);
         static int lua_open_recent(lua_State* state);
 
         void apply_acceleration_settings();
