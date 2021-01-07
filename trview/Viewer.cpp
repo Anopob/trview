@@ -641,6 +641,11 @@ namespace trview
         }
 
         _compare_level = std::make_unique<Level>(_device, *_shader_storage.get(), std::move(new_level), *_type_name_lookup);
+
+        if (_level)
+        {
+            auto diff = _level->generate_diff(*_compare_level);
+        }
     }
 
     void Viewer::render()

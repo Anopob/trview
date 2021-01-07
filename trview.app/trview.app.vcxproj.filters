@@ -416,6 +416,9 @@
       <Filter>Lua</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Diff\Diff.h">
+      <Filter>Diff</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Windows">
@@ -450,6 +453,9 @@
     </Filter>
     <Filter Include="Lua">
       <UniqueIdentifier>{8fe99dfb-e6c8-4786-8bfa-952a19ea124a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Diff">
+      <UniqueIdentifier>{71bc0eb8-2995-43da-a3a2-5c84331aeec6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

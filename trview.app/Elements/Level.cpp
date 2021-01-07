@@ -623,6 +623,57 @@ namespace trview
         return _version;
     }
 
+    Diff Level::generate_diff(const Level& other) const
+    {
+        Diff diff;
+
+        // Item change detection:
+        for (uint32_t i = 0; i < _items.size(); ++i)
+        {
+            break;
+            const auto ours = _items[i];
+            if (i >= _items.size())
+            {
+                diff.changes.push_back({ Diff::Change::Type::Delete, Diff::Change::Subject::Item, i });
+            }
+            else
+            {
+                const auto theirs = other._items[i];
+            }
+        }
+
+        // Trigger change detection:
+        const uint32_t max_trigger_count = std::max(_triggers.size(), other._triggers.size());
+        for (uint32_t i = 0; i < max_trigger_count; ++i)
+        {
+            // Trigger has been deleted - mark everything past this point as deleted.
+            if (i >= other._triggers.size())
+            {
+                for (uint32_t j = i; j < _triggers.size(); ++j)
+                {
+                    diff.changes.push_back({ Diff::Change::Type::Delete, Diff::Change::Subject::Trigger, j });
+                }
+                break;
+            }
+            else if (i >= _triggers.size())
+            {
+                for (uint32_t j = i; j < other._triggers.size(); ++j)
+                {
+                    diff.changes.push_back({ Diff::Change::Type::Add, Diff::Change::Subject::Trigger, j });
+                }
+                break;
+            }
+            else
+            {
+                // Check contents of trigger.
+                const auto ours = _triggers[i].get();
+                const auto theirs = other._triggers[i].get();
+            }
+        }
+
+        return diff;
+    }
+
     bool find_item_by_type_id(const Level& level, uint32_t type_id, Item& output_item)
     {
         const auto& items = level.items();

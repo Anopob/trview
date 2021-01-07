@@ -19,6 +19,7 @@
 #include <trview.app/Elements/Trigger.h>
 
 #include <trview.app/Graphics/IMeshStorage.h>
+#include <trview.app/Diff/Diff.h>
 
 #include <trview.graphics/RenderTarget.h>
 
@@ -152,6 +153,9 @@ namespace trview
         Event<> on_level_changed;
 
         trlevel::LevelVersion version() const;
+
+        /// Generate a diff between this level and another.
+        Diff generate_diff(const Level& other) const;
     private:
         void generate_rooms(const graphics::Device& device, const trlevel::ILevel& level);
         void generate_triggers();
