@@ -228,6 +228,16 @@ namespace trview
         _visible = value;
     }
 
+    bool Trigger::operator== (const Trigger& other) const
+    {
+        return number() == other.number() &&
+            room() == other.room() &&
+            flags() == other.flags() &&
+            only_once() == other.only_once() &&
+            timer() == other.timer() &&
+            std::is_permutation(_commands.begin(), _commands.end(), other._commands.begin(), other._commands.end());
+    }
+
     std::wstring trigger_type_name(TriggerType type)
     {
         auto name = trigger_type_names.find(type);
@@ -256,5 +266,16 @@ namespace trview
             return TriggerCommandType::Object;
         }
         return type->second;
+    }
+
+    bool operator!= (const Trigger& left, const Trigger& right)
+    {
+        return !(left == right);
+    }
+
+    bool operator== (const Command& left, const Command& right)
+    {
+        return left.type() == right.type() &&
+               left.index() == right.index();
     }
 }

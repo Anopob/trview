@@ -70,6 +70,8 @@ namespace trview
         /// Set whether the item is visible.
         /// @param value Whether the item is visible.
         void set_visible(bool value);
+
+        bool operator==(const Item& other) const;
     private:
         std::vector<Trigger*> _triggers;
         DirectX::SimpleMath::Vector3 _position;
@@ -81,4 +83,6 @@ namespace trview
         uint16_t _flags{ 0u };
         bool _visible{ true };
     };
+
+    bool operator != (const Item& left, const Item& right);
 }

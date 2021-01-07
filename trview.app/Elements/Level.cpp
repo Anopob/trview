@@ -627,26 +627,38 @@ namespace trview
     {
         Diff diff;
 
-        // Item change detection:
         for (uint32_t i = 0; i < _items.size(); ++i)
         {
-            break;
-            const auto ours = _items[i];
-            if (i >= _items.size())
+            if (i >= other._items.size())
             {
-                diff.changes.push_back({ Diff::Change::Type::Delete, Diff::Change::Subject::Item, i });
+                for (uint32_t j = i; j < _items.size(); ++j)
+                {
+                    diff.changes.push_back({ Diff::Change::Type::Delete, Diff::Change::Subject::Item, j });
+                }
+                break;
+            }
+            else if (i >= _items.size())
+            {
+                for (uint32_t j = i; j < other._items.size(); ++j)
+                {
+                    diff.changes.push_back({ Diff::Change::Type::Add, Diff::Change::Subject::Item, j });
+                }
+                break;
             }
             else
             {
+                const auto ours = _items[i];
                 const auto theirs = other._items[i];
+                if (ours != theirs)
+                {
+                    diff.changes.push_back({ Diff::Change::Type::Edit, Diff::Change::Subject::Item, i });
+                }
             }
         }
 
-        // Trigger change detection:
         const uint32_t max_trigger_count = std::max(_triggers.size(), other._triggers.size());
         for (uint32_t i = 0; i < max_trigger_count; ++i)
         {
-            // Trigger has been deleted - mark everything past this point as deleted.
             if (i >= other._triggers.size())
             {
                 for (uint32_t j = i; j < _triggers.size(); ++j)
@@ -665,9 +677,12 @@ namespace trview
             }
             else
             {
-                // Check contents of trigger.
                 const auto ours = _triggers[i].get();
                 const auto theirs = other._triggers[i].get();
+                if (*ours != *theirs)
+                {
+                    diff.changes.push_back({ Diff::Change::Type::Edit, Diff::Change::Subject::Trigger, i });
+                }
             }
         }
 

@@ -9,6 +9,7 @@ namespace trview
             enum class Type
             {
                 Add,
+                Edit,
                 Delete
             };
 

@@ -68,6 +68,8 @@ namespace trview
         virtual void get_transparent_triangles(TransparencyBuffer& transparency, const ICamera& camera, const DirectX::SimpleMath::Color& colour) override;
         virtual bool visible() const override;
         virtual void set_visible(bool value) override;
+
+        bool operator== (const Trigger& other) const;
     private:
         std::vector<uint16_t> _objects;
         std::vector<Command> _commands;
@@ -99,4 +101,7 @@ namespace trview
     /// @param name The string to convert.
     /// @returns The trigger command type.
     TriggerCommandType command_from_name(const std::wstring& name);
+
+    bool operator!= (const Trigger& left, const Trigger& right);
+    bool operator== (const Command& left, const Command& right);
 }

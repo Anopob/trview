@@ -66,4 +66,22 @@ namespace trview
     {
         _visible = value;
     }
+
+    bool Item::operator==(const Item& other) const
+    {
+        return number() == other.number() &&
+            room() == other.room() &&
+            type_id() == other.type_id() &&
+            ocb() == other.ocb() &&
+            activation_flags() == other.activation_flags() &&
+            clear_body_flag() == other.clear_body_flag() &&
+            invisible_flag() == other.invisible_flag() &&
+            position() == other.position();
+        // Triggers?
+    }
+
+    bool operator != (const Item& left, const Item& right)
+    {
+        return !(left == right);
+    }
 }
