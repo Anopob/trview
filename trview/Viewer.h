@@ -131,6 +131,7 @@ namespace trview
         static int lua_open(lua_State* state);
         static int lua_open_diff(lua_State* state);
         static int lua_open_recent(lua_State* state);
+        static int lua_toggle_diff(lua_State* state);
 
         void apply_acceleration_settings();
 
@@ -197,6 +198,8 @@ namespace trview
         std::vector<PickResult> _recent_orbits;
         std::size_t _recent_orbit_index{ 0u };
         Lua _lua;
+
+        bool _render_diff{ false };
     };
 }
 

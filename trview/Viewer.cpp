@@ -701,25 +701,26 @@ namespace trview
 
     void Viewer::render_scene()
     {
-        if (_level)
+        auto level = _render_diff ? _compare_level.get() : _level.get();
+        if (level)
         {
             // Update the view matrix based on the room selected in the room window.
-            if (_level->number_of_rooms() > 0)
+            if (level->number_of_rooms() > 0)
             {
                 _camera.set_target(_target);
             }
-            _level->render(_device, current_camera(), _show_selection);
-            _sector_highlight.render(_device, current_camera(), _level->texture_storage());
+            level->render(_device, current_camera(), _show_selection);
+            _sector_highlight.render(_device, current_camera(), level->texture_storage());
 
-            _measure->render(_device.context(), current_camera(), _level->texture_storage());
+            _measure->render(_device.context(), current_camera(), level->texture_storage());
 
             if (_show_route)
             {
-                _route->render(_device, current_camera(), _level->texture_storage());
+                _route->render(_device, current_camera(), level->texture_storage());
             }
 
-            _level->render_transparency(_device, current_camera());
-            _compass->render(_device, current_camera(), _level->texture_storage());
+            level->render_transparency(_device, current_camera());
+            _compass->render(_device, current_camera(), level->texture_storage());
         }
     }
 
@@ -1188,6 +1189,9 @@ namespace trview
         lua_pushcfunction(state, lua_open_recent);
         lua_setfield(state, -2, "openRecent");
 
+        lua_pushcfunction(state, lua_toggle_diff);
+        lua_setfield(state, -2, "togglediff");
+
         lua_setmetatable(state, -2);
         lua_setglobal(state, "trview");
     }
@@ -1217,6 +1221,14 @@ namespace trview
         {
             viewer->open(*std::next(settings.recent_files.begin(), index - 1));
         }
+        return 0;
+    }
+
+    int Viewer::lua_toggle_diff(lua_State* state)
+    {
+        auto viewer = (*reinterpret_cast<Viewer**>(luaL_checkudata(state, 1, "trview.mt")));
+        viewer->_render_diff = !viewer->_render_diff;
+        viewer->_scene_changed = true;
         return 0;
     }
 
