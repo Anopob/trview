@@ -92,6 +92,8 @@ namespace trview
         _token_store += _rooms_windows->on_item_selected += [this](const auto& item) { select_item(item); };
         _token_store += _rooms_windows->on_trigger_selected += [this](const auto& trigger) { select_trigger(trigger); };
 
+        _diff_window = std::make_unique<DiffWindow>(_device, *_shader_storage.get(), _font_factory, window);
+
         _token_store += _level_switcher.on_switch_level += [=](const auto& file) { open(file); };
         _token_store += on_file_loaded += [&](const auto& file) { _level_switcher.open_file(file); };
 
@@ -645,6 +647,7 @@ namespace trview
         if (_level)
         {
             auto diff = _level->generate_diff(*_compare_level);
+            _diff_window->set_diff(diff);
         }
     }
 
@@ -697,6 +700,7 @@ namespace trview
         _triggers_windows->render(_device, _settings.vsync);
         _route_window_manager->render(_device, _settings.vsync);
         _rooms_windows->render(_device, _settings.vsync);
+        _diff_window->render(_device, _settings.vsync);
     }
 
     bool Viewer::should_pick() const

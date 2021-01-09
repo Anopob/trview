@@ -81,6 +81,7 @@
     <ClCompile Include="UI\ViewerUI.cpp" />
     <ClCompile Include="UI\ViewOptions.cpp" />
     <ClCompile Include="Windows\CollapsiblePanel.cpp" />
+    <ClCompile Include="Windows\DiffWindow.cpp" />
     <ClCompile Include="Windows\ItemsWindow.cpp" />
     <ClCompile Include="Windows\ItemsWindowManager.cpp" />
     <ClCompile Include="Windows\RoomsWindow.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="UI\ViewerUI.h" />
     <ClInclude Include="UI\ViewOptions.h" />
     <ClInclude Include="Windows\CollapsiblePanel.h" />
+    <ClInclude Include="Windows\DiffWindow.h" />
     <ClInclude Include="Windows\ItemsWindow.h" />
     <ClInclude Include="Windows\ItemsWindowManager.h" />
     <ClInclude Include="Windows\RoomsWindow.h" />

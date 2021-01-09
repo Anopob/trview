@@ -44,6 +44,7 @@
 #include <trview.app/Menus/MenuDetector.h>
 #include <trview.app/Lua/Lua.h>
 #include <trview.common/Windows/Shortcuts.h>
+#include <trview.app/Windows/DiffWindow.h>
 
 namespace trview
 {
@@ -141,6 +142,7 @@ namespace trview
         std::unique_ptr<ItemsWindowManager> _items_windows;
         std::unique_ptr<TriggersWindowManager> _triggers_windows;
         std::unique_ptr<RoomsWindowManager> _rooms_windows;
+        std::unique_ptr<DiffWindow> _diff_window;
         std::unique_ptr<Level> _level;
         std::unique_ptr<Level> _compare_level;
         Window _window;
