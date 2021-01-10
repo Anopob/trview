@@ -15,9 +15,11 @@ namespace trview
     private:
         std::unique_ptr<ui::Control> create_left_panel();
         std::unique_ptr<ui::Control> create_right_panel();
+        std::unique_ptr<ui::Control> create_item_diff_panel();
         ui::Listbox* _diff_list{ nullptr };
-        ui::Window* _items_diff{ nullptr };
+        ui::Control* _items_diff{ nullptr };
         ui::Window* _triggers_diff{ nullptr };
         ui::Window* _geometry_diff{ nullptr };
+
     };
 }

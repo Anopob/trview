@@ -1,6 +1,7 @@
 #include "DiffWindow.h"
 #include <trview.ui/StackPanel.h>
 #include <trview.ui/Label.h>
+#include <trview.ui/GroupBox.h>
 
 namespace trview
 {
@@ -99,9 +100,7 @@ namespace trview
         auto panel = std::make_unique<ui::Window>(Size(550, window().size().height), Colours::RightPanel);
 
         // Different panels for different diff types.
-        _items_diff = panel->add_child(std::make_unique<StackPanel>(Size(550, window().size().height), Colours::RightPanel));
-        _items_diff->set_visible(false);
-        _items_diff->add_child(std::make_unique<Label>(Size(100, 20), Colours::RightPanel, L"Items Diff...", 8));
+        _items_diff = panel->add_child(create_item_diff_panel());
 
         _triggers_diff = panel->add_child(std::make_unique<StackPanel>(Size(550, window().size().height), Colours::RightPanel));
         _triggers_diff->set_visible(false);
@@ -110,6 +109,23 @@ namespace trview
         _geometry_diff = panel->add_child(std::make_unique<StackPanel>(Size(550, window().size().height), Colours::RightPanel));
         _geometry_diff->set_visible(false);
         _geometry_diff->add_child(std::make_unique<Label>(Size(100, 20), Colours::RightPanel, L"Geometry Diff...", 8));
+
+        return std::move(panel);
+    }
+
+    std::unique_ptr<ui::Control> DiffWindow::create_item_diff_panel()
+    {
+        using namespace ui;
+        auto panel = std::make_unique<StackPanel>(Size(550, window().size().height), Colours::RightPanel);
+        panel->set_visible(false);
+
+        auto diff_pair = panel->add_child(std::make_unique<StackPanel>(Size(550, 300), Colours::RightPanel, Size(), StackPanel::Direction::Horizontal));
+        auto left = diff_pair->add_child(std::make_unique<Listbox>(Size(225, 300), Colour::Green));
+        left->set_columns({
+                { Listbox::Column::Type::Number, L"#", 35 },
+                { Listbox::Column::Type::String, L"Left", 45 },
+                { Listbox::Column::Type::String, L"Right", 45 },
+            });
 
         return std::move(panel);
     }
