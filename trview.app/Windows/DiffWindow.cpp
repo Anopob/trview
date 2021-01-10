@@ -49,7 +49,7 @@ namespace trview
     }
 
     DiffWindow::DiffWindow(graphics::Device& device, const graphics::IShaderStorage& shader_storage, const graphics::IFontFactory& font_factory, const Window& parent)
-        : CollapsiblePanel(device, shader_storage, font_factory, parent, L"DiffWindow", L"Diff", Size(800, 800))
+        : CollapsiblePanel(device, shader_storage, font_factory, parent, L"DiffWindow", L"Diff", Size(800, 400))
     {
         set_panels(create_left_panel(), create_right_panel());
     }
