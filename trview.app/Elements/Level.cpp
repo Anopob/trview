@@ -634,7 +634,7 @@ namespace trview
             {
                 for (uint32_t j = i; j < _items.size(); ++j)
                 {
-                    diff.changes.push_back({ ++diff_index, Diff::Change::Type::Delete, Diff::Change::Subject::Item, j });
+                    diff.changes.push_back({ diff_index++, Diff::Change::Type::Delete, Diff::Change::Subject::Item, j });
                 }
                 break;
             }
@@ -642,7 +642,7 @@ namespace trview
             {
                 for (uint32_t j = i; j < other._items.size(); ++j)
                 {
-                    diff.changes.push_back({ ++diff_index, Diff::Change::Type::Add, Diff::Change::Subject::Item, j });
+                    diff.changes.push_back({ diff_index++, Diff::Change::Type::Add, Diff::Change::Subject::Item, j });
                 }
                 break;
             }
@@ -652,7 +652,7 @@ namespace trview
                 const auto theirs = other._items[i];
                 if (ours != theirs)
                 {
-                    diff.changes.push_back({ ++diff_index, Diff::Change::Type::Edit, Diff::Change::Subject::Item, i });
+                    diff.changes.push_back({ diff_index++, Diff::Change::Type::Edit, Diff::Change::Subject::Item, i });
                 }
             }
         }
@@ -664,7 +664,7 @@ namespace trview
             {
                 for (uint32_t j = i; j < _triggers.size(); ++j)
                 {
-                    diff.changes.push_back({ ++diff_index, Diff::Change::Type::Delete, Diff::Change::Subject::Trigger, j });
+                    diff.changes.push_back({ diff_index++, Diff::Change::Type::Delete, Diff::Change::Subject::Trigger, j });
                 }
                 break;
             }
@@ -672,7 +672,7 @@ namespace trview
             {
                 for (uint32_t j = i; j < other._triggers.size(); ++j)
                 {
-                    diff.changes.push_back({ ++diff_index, Diff::Change::Type::Add, Diff::Change::Subject::Trigger, j });
+                    diff.changes.push_back({ diff_index++, Diff::Change::Type::Add, Diff::Change::Subject::Trigger, j });
                 }
                 break;
             }
@@ -682,7 +682,7 @@ namespace trview
                 const auto theirs = other._triggers[i].get();
                 if (*ours != *theirs)
                 {
-                    diff.changes.push_back({ ++diff_index, Diff::Change::Type::Edit, Diff::Change::Subject::Trigger, i });
+                    diff.changes.push_back({ diff_index++, Diff::Change::Type::Edit, Diff::Change::Subject::Trigger, i });
                 }
             }
         }

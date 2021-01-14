@@ -2,6 +2,7 @@
 #include <trview.ui/StackPanel.h>
 #include <trview.ui/Label.h>
 #include <trview.ui/GroupBox.h>
+#include <trview.common/Strings.h>
 
 namespace trview
 {
@@ -50,7 +51,7 @@ namespace trview
     }
 
     DiffWindow::DiffWindow(graphics::Device& device, const graphics::IShaderStorage& shader_storage, const graphics::IFontFactory& font_factory, const Window& parent)
-        : CollapsiblePanel(device, shader_storage, font_factory, parent, L"DiffWindow", L"Diff", Size(800, 400))
+        : CollapsiblePanel(device, shader_storage, font_factory, parent, L"DiffWindow", L"Diff", Size(480, 400))
     {
         set_panels(create_left_panel(), create_right_panel());
     }
@@ -58,9 +59,9 @@ namespace trview
     std::unique_ptr<ui::Control> DiffWindow::create_left_panel()
     {
         using namespace ui;
-        auto panel = std::make_unique<StackPanel>(Size(250, window().size().height), Colours::LeftPanel);
+        auto panel = std::make_unique<StackPanel>(Size(180, window().size().height), Colours::LeftPanel);
 
-        _diff_list = panel->add_child(std::make_unique<Listbox>(Size(250, 400), Colours::Diffs));
+        _diff_list = panel->add_child(std::make_unique<Listbox>(Size(180, 400), Colours::Diffs));
         _diff_list->set_columns({
                 { Listbox::Column::Type::Number, L"#", 35 },
                 { Listbox::Column::Type::String, L"Type", 45 },
@@ -73,9 +74,7 @@ namespace trview
             const auto type = item.value(L"Subject");
             if (type == L"Item")
             {
-                _items_diff->set_visible(true);
-                _triggers_diff->set_visible(false);
-                _geometry_diff->set_visible(false);
+                start_item_diff(_diff.changes[std::stoi(item.value(L"#"))]);
             }
             else if (type == L"Trigger")
             {
@@ -97,16 +96,16 @@ namespace trview
     std::unique_ptr<ui::Control> DiffWindow::create_right_panel()
     {
         using namespace ui;
-        auto panel = std::make_unique<ui::Window>(Size(550, window().size().height), Colours::RightPanel);
+        auto panel = std::make_unique<ui::Window>(Size(300, window().size().height), Colours::RightPanel);
 
         // Different panels for different diff types.
         _items_diff = panel->add_child(create_item_diff_panel());
 
-        _triggers_diff = panel->add_child(std::make_unique<StackPanel>(Size(550, window().size().height), Colours::RightPanel));
+        _triggers_diff = panel->add_child(std::make_unique<StackPanel>(Size(300, window().size().height), Colours::RightPanel));
         _triggers_diff->set_visible(false);
         _triggers_diff->add_child(std::make_unique<Label>(Size(100, 20), Colours::RightPanel, L"Triggers Diff...", 8));
 
-        _geometry_diff = panel->add_child(std::make_unique<StackPanel>(Size(550, window().size().height), Colours::RightPanel));
+        _geometry_diff = panel->add_child(std::make_unique<StackPanel>(Size(300, window().size().height), Colours::RightPanel));
         _geometry_diff->set_visible(false);
         _geometry_diff->add_child(std::make_unique<Label>(Size(100, 20), Colours::RightPanel, L"Geometry Diff...", 8));
 
@@ -116,25 +115,78 @@ namespace trview
     std::unique_ptr<ui::Control> DiffWindow::create_item_diff_panel()
     {
         using namespace ui;
-        auto panel = std::make_unique<StackPanel>(Size(550, window().size().height), Colours::RightPanel);
+        auto panel = std::make_unique<StackPanel>(Size(300, window().size().height), Colours::RightPanel);
         panel->set_visible(false);
 
-        auto diff_pair = panel->add_child(std::make_unique<StackPanel>(Size(550, 300), Colours::RightPanel, Size(), StackPanel::Direction::Horizontal));
-        auto left = diff_pair->add_child(std::make_unique<Listbox>(Size(225, 300), Colour::Green));
-        left->set_columns({
-                { Listbox::Column::Type::Number, L"#", 35 },
-                { Listbox::Column::Type::String, L"Left", 45 },
-                { Listbox::Column::Type::String, L"Right", 45 },
+        auto diff_pair = panel->add_child(std::make_unique<StackPanel>(Size(300, 300), Colours::RightPanel, Size(), StackPanel::Direction::Horizontal));
+        _item_diff = diff_pair->add_child(std::make_unique<Listbox>(Size(300, 300), Colours::RightPanel));
+        _item_diff->set_show_scrollbar(false);
+        _item_diff->set_columns({
+                { Listbox::Column::Type::String, L"Property", 60 },
+                { Listbox::Column::Type::String, L"Left", 120 },
+                { Listbox::Column::Type::String, L"Right", 120 },
             });
-
         return std::move(panel);
     }
 
     void DiffWindow::set_diff(const Diff& diff)
     {
+        _diff = diff;
+
         using namespace ui;
         std::vector<Listbox::Item> list_items;
         std::transform(diff.changes.begin(), diff.changes.end(), std::back_inserter(list_items), create_listbox_item);
         _diff_list->set_items(list_items);
+    }
+
+    void DiffWindow::set_items(const std::vector<Item>& left, const std::vector<Item>& right)
+    {
+        _left_items = left;
+        _right_items = right;
+    }
+
+    namespace
+    {
+        std::wstring to_string(const DirectX::SimpleMath::Vector3& pos)
+        {
+            std::wstringstream pos_string;
+            pos_string << pos.x * trlevel::Scale_X << L", " << pos.y * trlevel::Scale_Y << L", " << pos.z * trlevel::Scale_Z;
+            return pos_string.str();
+        }
+    }
+
+    void DiffWindow::start_item_diff(const Diff::Change& change)
+    {
+        _items_diff->set_visible(true);
+        _triggers_diff->set_visible(false);
+        _geometry_diff->set_visible(false);
+
+        uint32_t i = 0;
+        std::vector<ui::Listbox::Item> items;
+        auto add_row = [&](auto name, auto left_value, auto right_value)
+        {
+            items.push_back(
+                { {{ L"#", std::to_wstring(i++) },
+                { L"Property", name },
+                { L"Left", left_value },
+                { L"Right", right_value }} });
+        };
+
+        if (change.type == Diff::Change::Type::Edit)
+        {
+            const auto left = _left_items[change.index];
+            const auto right = _right_items[change.index];
+
+            add_row(L"Type", left.type(), right.type());
+            add_row(L"Position", to_string(left.position()), to_string(right.position()));
+            add_row(L"Type ID", std::to_wstring(left.type_id()), std::to_wstring(right.type_id()));
+            add_row(L"Room", std::to_wstring(left.room()), std::to_wstring(right.room()));
+            add_row(L"Clear Body", format_bool(left.clear_body_flag()), format_bool(right.clear_body_flag()));
+            add_row(L"Invisible", format_bool(left.invisible_flag()), format_bool(right.invisible_flag()));
+            add_row(L"Flags", format_binary(left.activation_flags()), format_binary(right.activation_flags()));
+            add_row(L"OCB", std::to_wstring(left.ocb()), std::to_wstring(right.ocb()));
+        }
+
+        _item_diff->set_items(items);
     }
 }

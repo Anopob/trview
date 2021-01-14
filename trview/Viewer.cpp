@@ -648,6 +648,7 @@ namespace trview
         {
             auto diff = _level->generate_diff(*_compare_level);
             _diff_window->set_diff(diff);
+            _diff_window->set_items(_level->items(), _compare_level->items());
         }
     }
 
