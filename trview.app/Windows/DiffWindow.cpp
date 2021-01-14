@@ -3,6 +3,8 @@
 #include <trview.ui/Label.h>
 #include <trview.ui/GroupBox.h>
 #include <trview.common/Strings.h>
+#include <trview.ui/Button.h>
+#include <trview.ui/Grid.h>
 
 namespace trview
 {
@@ -96,16 +98,24 @@ namespace trview
     std::unique_ptr<ui::Control> DiffWindow::create_right_panel()
     {
         using namespace ui;
-        auto panel = std::make_unique<ui::Window>(Size(300, window().size().height), Colours::RightPanel);
+        auto panel = std::make_unique<ui::StackPanel>(Size(300, window().size().height), Colours::RightPanel);
+
+        auto switcher = panel->add_child(std::make_unique<ui::Grid>(Size(300, 32), Colour::Blue, 2, 1));
+        auto a_button = switcher->add_child(std::make_unique<ui::Button>(Size(150, 32), L"A"));
+        _token_store += a_button->on_click += [&]() { on_version_selected(Version::Left); };
+        auto b_button = switcher->add_child(std::make_unique<ui::Button>(Size(150, 32), L"B"));
+        _token_store += b_button->on_click += [&]() { on_version_selected(Version::Right); };
+
+        auto area = panel->add_child(std::make_unique<ui::Window>(Size(300, window().size().height - switcher->size().height), Colours::RightPanel));
 
         // Different panels for different diff types.
-        _items_diff = panel->add_child(create_item_diff_panel());
+        _items_diff = area->add_child(create_item_diff_panel());
 
-        _triggers_diff = panel->add_child(std::make_unique<StackPanel>(Size(300, window().size().height), Colours::RightPanel));
+        _triggers_diff = area->add_child(std::make_unique<StackPanel>(Size(300, window().size().height), Colours::RightPanel));
         _triggers_diff->set_visible(false);
         _triggers_diff->add_child(std::make_unique<Label>(Size(100, 20), Colours::RightPanel, L"Triggers Diff...", 8));
 
-        _geometry_diff = panel->add_child(std::make_unique<StackPanel>(Size(300, window().size().height), Colours::RightPanel));
+        _geometry_diff = area->add_child(std::make_unique<StackPanel>(Size(300, window().size().height), Colours::RightPanel));
         _geometry_diff->set_visible(false);
         _geometry_diff->add_child(std::make_unique<Label>(Size(100, 20), Colours::RightPanel, L"Geometry Diff...", 8));
 

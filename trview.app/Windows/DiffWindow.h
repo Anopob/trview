@@ -14,6 +14,14 @@ namespace trview
         virtual ~DiffWindow() = default;
         void set_diff(const Diff& diff);
         void set_items(const std::vector<Item>& left, const std::vector<Item>& right);
+
+        enum class Version
+        {
+            Left,
+            Right
+        };
+
+        Event<Version> on_version_selected;
     private:
         void start_item_diff(const Diff::Change& change);
 

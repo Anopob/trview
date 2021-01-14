@@ -93,6 +93,11 @@ namespace trview
         _token_store += _rooms_windows->on_trigger_selected += [this](const auto& trigger) { select_trigger(trigger); };
 
         _diff_window = std::make_unique<DiffWindow>(_device, *_shader_storage.get(), _font_factory, window);
+        _token_store += _diff_window->on_version_selected += [&](DiffWindow::Version version)
+        {
+            _render_diff = version == DiffWindow::Version::Right;
+            _scene_changed = true; 
+        };
 
         _token_store += _level_switcher.on_switch_level += [=](const auto& file) { open(file); };
         _token_store += on_file_loaded += [&](const auto& file) { _level_switcher.open_file(file); };
