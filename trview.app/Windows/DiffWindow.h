@@ -37,5 +37,8 @@ namespace trview
         ui::Listbox* _item_diff{ nullptr };
         std::vector<Item> _left_items;
         std::vector<Item> _right_items;
+
+        ui::Button* _a_button{ nullptr };
+        ui::Button* _b_button{ nullptr };
     };
 }

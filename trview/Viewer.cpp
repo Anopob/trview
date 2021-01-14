@@ -96,6 +96,11 @@ namespace trview
         _token_store += _diff_window->on_version_selected += [&](DiffWindow::Version version)
         {
             _render_diff = version == DiffWindow::Version::Right;
+            if (_compare_level)
+            {
+                _level->on_camera_moved();
+                _compare_level->on_camera_moved();
+            }
             _scene_changed = true; 
         };
 

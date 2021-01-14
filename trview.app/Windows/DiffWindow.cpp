@@ -101,10 +101,23 @@ namespace trview
         auto panel = std::make_unique<ui::StackPanel>(Size(300, window().size().height), Colours::RightPanel);
 
         auto switcher = panel->add_child(std::make_unique<ui::Grid>(Size(300, 32), Colour::Blue, 2, 1));
-        auto a_button = switcher->add_child(std::make_unique<ui::Button>(Size(150, 32), L"A"));
-        _token_store += a_button->on_click += [&]() { on_version_selected(Version::Left); };
-        auto b_button = switcher->add_child(std::make_unique<ui::Button>(Size(150, 32), L"B"));
-        _token_store += b_button->on_click += [&]() { on_version_selected(Version::Right); };
+        _a_button = switcher->add_child(std::make_unique<ui::Button>(Size(150, 32), L"A"));
+        _token_store += _a_button->on_click += [&]()
+        {
+            _a_button->set_text_background_colour(Colour::LightGrey);
+            _b_button->set_text_background_colour(Colour::Grey);
+            on_version_selected(Version::Left);
+        };
+        _b_button = switcher->add_child(std::make_unique<ui::Button>(Size(150, 32), L"B"));
+        _token_store += _b_button->on_click += [&]()
+        {
+            _a_button->set_text_background_colour(Colour::Grey);
+            _b_button->set_text_background_colour(Colour::LightGrey);
+            on_version_selected(Version::Right);
+        };
+
+        _a_button->set_text_background_colour(Colour::LightGrey);
+        _b_button->set_text_background_colour(Colour::Grey);
 
         auto area = panel->add_child(std::make_unique<ui::Window>(Size(300, window().size().height - switcher->size().height), Colours::RightPanel));
 
