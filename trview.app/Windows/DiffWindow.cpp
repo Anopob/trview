@@ -13,6 +13,7 @@ namespace trview
         const Colour LeftPanel{ 1.0f, 0.25f, 0.25f, 0.25f };
         const Colour RightPanel{ 1.0f, 0.225f, 0.225f, 0.225f };
         const Colour Diffs{ 1.0f, 0.20f, 0.20f, 0.20f };
+        const Colour ButtonOriginal{ 0.25f, 0.25f, 0.25f };
     }
 
     namespace
@@ -105,19 +106,19 @@ namespace trview
         _token_store += _a_button->on_click += [&]()
         {
             _a_button->set_text_background_colour(Colour::LightGrey);
-            _b_button->set_text_background_colour(Colour::Grey);
+            _b_button->set_text_background_colour(Colours::ButtonOriginal);
             on_version_selected(Version::Left);
         };
         _b_button = switcher->add_child(std::make_unique<ui::Button>(Size(150, 32), L"B"));
         _token_store += _b_button->on_click += [&]()
         {
-            _a_button->set_text_background_colour(Colour::Grey);
+            _a_button->set_text_background_colour(Colours::ButtonOriginal);
             _b_button->set_text_background_colour(Colour::LightGrey);
             on_version_selected(Version::Right);
         };
 
         _a_button->set_text_background_colour(Colour::LightGrey);
-        _b_button->set_text_background_colour(Colour::Grey);
+        _b_button->set_text_background_colour(Colours::ButtonOriginal);
 
         auto area = panel->add_child(std::make_unique<ui::Window>(Size(300, window().size().height - switcher->size().height), Colours::RightPanel));
 
