@@ -77,7 +77,9 @@ namespace trview
             const auto type = item.value(L"Subject");
             if (type == L"Item")
             {
-                start_item_diff(_diff.changes[std::stoi(item.value(L"#"))]);
+                auto change = _diff.changes[std::stoi(item.value(L"#"))];
+                on_item_selected(_left_items[change.index]);
+                start_item_diff(change);
             }
             else if (type == L"Trigger")
             {

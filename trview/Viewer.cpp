@@ -101,8 +101,9 @@ namespace trview
                 _level->on_camera_moved();
                 _compare_level->on_camera_moved();
             }
-            _scene_changed = true; 
+            _scene_changed = true;
         };
+        _token_store += _diff_window->on_item_selected += [&](const auto& item) { select_item(item); };
 
         _token_store += _level_switcher.on_switch_level += [=](const auto& file) { open(file); };
         _token_store += on_file_loaded += [&](const auto& file) { _level_switcher.open_file(file); };

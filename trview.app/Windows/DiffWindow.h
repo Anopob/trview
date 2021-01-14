@@ -22,6 +22,7 @@ namespace trview
         };
 
         Event<Version> on_version_selected;
+        Event<Item> on_item_selected;
     private:
         void start_item_diff(const Diff::Change& change);
 
