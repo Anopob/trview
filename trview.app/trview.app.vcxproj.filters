@@ -200,6 +200,9 @@
     <ClCompile Include="Windows\DiffWindow.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
+    <ClCompile Include="Windows\DiffWindowManager.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\Camera.h">
@@ -423,6 +426,9 @@
       <Filter>Diff</Filter>
     </ClInclude>
     <ClInclude Include="Windows\DiffWindow.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\DiffWindowManager.h">
       <Filter>Windows</Filter>
     </ClInclude>
   </ItemGroup>

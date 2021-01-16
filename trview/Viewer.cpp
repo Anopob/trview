@@ -92,8 +92,8 @@ namespace trview
         _token_store += _rooms_windows->on_item_selected += [this](const auto& item) { select_item(item); };
         _token_store += _rooms_windows->on_trigger_selected += [this](const auto& trigger) { select_trigger(trigger); };
 
-        _diff_window = std::make_unique<DiffWindow>(_device, *_shader_storage.get(), _font_factory, window);
-        _token_store += _diff_window->on_version_selected += [&](DiffWindow::Version version)
+        _diff_window_manager = std::make_unique<DiffWindowManager>(_device, *_shader_storage.get(), _font_factory, window, _shortcuts);
+        _token_store += _diff_window_manager->on_version_selected += [&](DiffWindow::Version version)
         {
             _render_diff = version == DiffWindow::Version::Right;
             if (_compare_level)
@@ -103,7 +103,7 @@ namespace trview
             }
             _scene_changed = true;
         };
-        _token_store += _diff_window->on_item_selected += [&](const auto& item) { select_item(item); };
+        _token_store += _diff_window_manager->on_item_selected += [&](const auto& item) { select_item(item); };
 
         _token_store += _level_switcher.on_switch_level += [=](const auto& file) { open(file); };
         _token_store += on_file_loaded += [&](const auto& file) { _level_switcher.open_file(file); };
@@ -658,8 +658,8 @@ namespace trview
         if (_level)
         {
             auto diff = _level->generate_diff(*_compare_level);
-            _diff_window->set_diff(diff);
-            _diff_window->set_items(_level->items(), _compare_level->items());
+            _diff_window_manager->set_diff(diff);
+            _diff_window_manager->set_items(_level->items(), _compare_level->items());
         }
     }
 
@@ -712,7 +712,7 @@ namespace trview
         _triggers_windows->render(_device, _settings.vsync);
         _route_window_manager->render(_device, _settings.vsync);
         _rooms_windows->render(_device, _settings.vsync);
-        _diff_window->render(_device, _settings.vsync);
+        _diff_window_manager->render(_device, _settings.vsync);
     }
 
     bool Viewer::should_pick() const
