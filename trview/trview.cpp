@@ -5,6 +5,7 @@
 #include "resource.h"
 
 #include "Viewer.h"
+#include <trview.common/Windows/File.h>
 
 #define MAX_LOADSTRING 100
 
@@ -175,29 +176,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case ID_FILE_OPEN:
             case ID_ACCEL_FILE_OPEN:
             {
-                wchar_t cd[MAX_PATH];
-                GetCurrentDirectoryW(MAX_PATH, cd);
-
-                OPENFILENAME ofn;
-                memset(&ofn, 0, sizeof(ofn));
-
-                wchar_t path[MAX_PATH];
-                memset(&path, 0, sizeof(path));
-
-                ofn.lStructSize = sizeof(ofn);
-                ofn.lpstrFile = path;
-                ofn.nMaxFile = MAX_PATH;
-                ofn.lpstrTitle = L"Open level";
-                ofn.lpstrFilter = L"All Tomb Raider Files\0*.tr*;*.phd\0";
-                ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-                if (GetOpenFileName(&ofn))
+                std::wstring filename;
+                if (trview::open_file(L"Open level", L"All Tomb Raider Files\0*.tr*;*.phd\0", filename))
                 {
-                    SetCurrentDirectory(cd);
-                    viewer->open(trview::to_utf8(ofn.lpstrFile));
+                    viewer->open(trview::to_utf8(filename));
                 }
                 break;
-            } 
+            }
+            case ID_FILE_OPENDIFF:
+            {
+                std::wstring filename;
+                if (trview::open_file(L"Open diff level", L"All Tomb Raider Files\0*.tr*;*.phd\0", filename))
+                {
+                    viewer->open_diff(trview::to_utf8(filename));
+                }
+                break;
+            }
             case ID_HELP_GITHUB:
             {
                 ShellExecute(0, 0, L"https://github.com/chreden/trview", 0, 0, SW_SHOW);

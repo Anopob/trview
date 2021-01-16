@@ -3,6 +3,7 @@
 #include <trview.ui/GroupBox.h>
 #include <trview.ui/Button.h>
 #include <trview.common/Strings.h>
+#include <trview.common/Windows/File.h>
 
 namespace trview
 {
@@ -94,21 +95,10 @@ namespace trview
         auto import = buttons->add_child(std::make_unique<Button>(Size(90, 20), L"Import"));
         _token_store += import->on_click += [&]()
         {
-            OPENFILENAME ofn;
-            memset(&ofn, 0, sizeof(ofn));
-
-            wchar_t path[MAX_PATH];
-            memset(&path, 0, sizeof(path));
-
-            ofn.lStructSize = sizeof(ofn);
-            ofn.lpstrFilter = L"trview route\0*.tvr\0";
-            ofn.nMaxFile = MAX_PATH;
-            ofn.lpstrTitle = L"Import route";
-            ofn.Flags = OFN_FILEMUSTEXIST;
-            ofn.lpstrFile = path;
-            if (GetOpenFileName(&ofn))
+            std::wstring filename;
+            if (open_file(L"Import route", L"trview route\0*.tvr\0", filename))
             {
-                on_route_import(trview::to_utf8(ofn.lpstrFile));
+                on_route_import(trview::to_utf8(filename));
             }
         };
         auto export_button = buttons->add_child(std::make_unique<Button>(Size(90, 20), L"Export"));
@@ -206,22 +196,11 @@ namespace trview
 
             if (!_route->waypoint(_selected_index).has_save())
             {
-                OPENFILENAME ofn;
-                memset(&ofn, 0, sizeof(ofn));
-
-                wchar_t path[MAX_PATH];
-                memset(&path, 0, sizeof(path));
-
-                ofn.lStructSize = sizeof(ofn);
-                ofn.lpstrFilter = L"Savegame File\0*.*\0";
-                ofn.nMaxFile = MAX_PATH;
-                ofn.lpstrTitle = L"Select Save";
-                ofn.Flags = OFN_FILEMUSTEXIST;
-                ofn.lpstrFile = path;
-                if (GetOpenFileName(&ofn))
+                std::wstring file;
+                if (open_file(L"Select Save", L"Savegame File\0*.*\0", file))
                 {
                     // Load bytes from file.
-                    auto filename = trview::to_utf8(ofn.lpstrFile);
+                    auto filename = trview::to_utf8(file);
                     try
                     {
                         std::ifstream infile;

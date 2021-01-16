@@ -31,6 +31,7 @@
     <ClInclude Include="TokenStore.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Windows\Clipboard.h" />
+    <ClInclude Include="Windows\File.h" />
     <ClInclude Include="Windows\Shortcuts.h" />
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +52,7 @@
     <ClCompile Include="TokenStore.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="Windows\Clipboard.cpp" />
+    <ClCompile Include="Windows\File.cpp" />
     <ClCompile Include="Windows\Shortcuts.cpp" />
   </ItemGroup>
   <ItemGroup>
