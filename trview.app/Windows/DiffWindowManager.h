@@ -20,6 +20,7 @@ namespace trview
 
         void set_items(const std::vector<Item>& left, const std::vector<Item>& right);
         void set_diff(const Diff& diff);
+        void clear_diff();
 
         Event<DiffWindow::Version> on_version_selected;
         Event<Item> on_item_selected;

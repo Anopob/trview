@@ -71,4 +71,18 @@ namespace trview
             _diff_window->render(device, vsync);
         }
     }
+
+    void DiffWindowManager::clear_diff()
+    {
+        _diff.reset();
+        _left_items.clear();
+        _right_items.clear();
+
+        if (_diff_window)
+        {
+            _diff_window->set_diff(Diff());
+            _diff_window->set_items(_left_items, _right_items);
+        }
+    }
 }
+

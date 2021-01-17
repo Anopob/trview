@@ -163,6 +163,10 @@ namespace trview
         std::vector<Listbox::Item> list_items;
         std::transform(diff.changes.begin(), diff.changes.end(), std::back_inserter(list_items), create_listbox_item);
         _diff_list->set_items(list_items);
+
+        _items_diff->set_visible(false);
+        _triggers_diff->set_visible(false);
+        _geometry_diff->set_visible(false);
     }
 
     void DiffWindow::set_items(const std::vector<Item>& left, const std::vector<Item>& right)

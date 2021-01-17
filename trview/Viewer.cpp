@@ -633,6 +633,7 @@ namespace trview
         _measure->reset();
         _route->clear();
         _route_window_manager->set_route(_route.get());
+        _diff_window_manager->clear_diff();
 
         _recent_orbits.clear();
         _recent_orbit_index = 0u;
@@ -660,6 +661,7 @@ namespace trview
             auto diff = _level->generate_diff(*_compare_level);
             _diff_window_manager->set_diff(diff);
             _diff_window_manager->set_items(_level->items(), _compare_level->items());
+            _diff_window_manager->create_window();
         }
     }
 
