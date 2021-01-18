@@ -78,14 +78,14 @@ namespace trview
             if (type == L"Item")
             {
                 auto change = _diff.changes[std::stoi(item.value(L"#"))];
-                on_item_selected(_left_items[change.index]);
+                on_item_selected(_diff.left_items[change.index]);
                 start_item_diff(change);
             }
             else if (type == L"Trigger")
             {
-                _items_diff->set_visible(false);
-                _triggers_diff->set_visible(true);
-                _geometry_diff->set_visible(false);
+                auto change = _diff.changes[std::stoi(item.value(L"#"))];
+                on_trigger_selected(_diff.left_triggers[change.index]);
+                start_trigger_diff(change);
             }
             else if (type == L"Geometry")
             {
@@ -169,12 +169,6 @@ namespace trview
         _geometry_diff->set_visible(false);
     }
 
-    void DiffWindow::set_items(const std::vector<Item>& left, const std::vector<Item>& right)
-    {
-        _left_items = left;
-        _right_items = right;
-    }
-
     namespace
     {
         std::wstring to_string(const DirectX::SimpleMath::Vector3& pos)
@@ -204,8 +198,8 @@ namespace trview
 
         if (change.type == Diff::Change::Type::Edit)
         {
-            const auto left = _left_items[change.index];
-            const auto right = _right_items[change.index];
+            const auto left = _diff.left_items[change.index];
+            const auto right = _diff.right_items[change.index];
 
             add_row(L"Type", left.type(), right.type());
             add_row(L"Position", to_string(left.position()), to_string(right.position()));
@@ -218,5 +212,41 @@ namespace trview
         }
 
         _item_diff->set_items(items);
+    }
+
+    void DiffWindow::start_trigger_diff(const Diff::Change& change)
+    {
+        _items_diff->set_visible(false);
+        _triggers_diff->set_visible(true);
+        _geometry_diff->set_visible(false);
+        /*
+        uint32_t i = 0;
+        std::vector<ui::Listbox::Item> items;
+        auto add_row = [&](auto name, auto left_value, auto right_value)
+        {
+            items.push_back(
+                { {{ L"#", std::to_wstring(i++) },
+                { L"Property", name },
+                { L"Left", left_value },
+                { L"Right", right_value }} });
+        };
+
+        if (change.type == Diff::Change::Type::Edit)
+        {
+            const auto left = _diff.left_items[change.index];
+            const auto right = _diff.right_items[change.index];
+
+            add_row(L"Type", left.type(), right.type());
+            add_row(L"Position", to_string(left.position()), to_string(right.position()));
+            add_row(L"Type ID", std::to_wstring(left.type_id()), std::to_wstring(right.type_id()));
+            add_row(L"Room", std::to_wstring(left.room()), std::to_wstring(right.room()));
+            add_row(L"Clear Body", format_bool(left.clear_body_flag()), format_bool(right.clear_body_flag()));
+            add_row(L"Invisible", format_bool(left.invisible_flag()), format_bool(right.invisible_flag()));
+            add_row(L"Flags", format_binary(left.activation_flags()), format_binary(right.activation_flags()));
+            add_row(L"OCB", std::to_wstring(left.ocb()), std::to_wstring(right.ocb()));
+        }
+
+        _item_diff->set_items(items);
+        */
     }
 }

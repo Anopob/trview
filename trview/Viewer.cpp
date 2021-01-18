@@ -104,6 +104,7 @@ namespace trview
             _scene_changed = true;
         };
         _token_store += _diff_window_manager->on_item_selected += [&](const auto& item) { select_item(item); };
+        _token_store += _diff_window_manager->on_trigger_selected += [&](const auto& trigger) { select_trigger(trigger); };
 
         _token_store += _level_switcher.on_switch_level += [=](const auto& file) { open(file); };
         _token_store += on_file_loaded += [&](const auto& file) { _level_switcher.open_file(file); };
@@ -660,9 +661,10 @@ namespace trview
         {
             auto diff = _level->generate_diff(*_compare_level);
             _diff_window_manager->set_diff(diff);
-            _diff_window_manager->set_items(_level->items(), _compare_level->items());
             _diff_window_manager->create_window();
         }
+
+        _scene_changed = true;
     }
 
     void Viewer::render()

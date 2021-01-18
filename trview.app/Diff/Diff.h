@@ -1,5 +1,10 @@
 #pragma once
 
+#include <cstdint>
+#include <vector>
+#include <trview.app/Elements/Item.h>
+#include <trview.app/Elements/Trigger.h>
+
 namespace trview
 {
     struct Diff
@@ -26,5 +31,9 @@ namespace trview
         };
 
         std::vector<Change> changes;
+        std::vector<Item> left_items;
+        std::vector<Item> right_items;
+        std::vector<const Trigger*> left_triggers;
+        std::vector<const Trigger*> right_triggers;
     };
 }

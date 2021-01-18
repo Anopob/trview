@@ -29,23 +29,13 @@ namespace trview
         // Otherwise create the window.
         _diff_window = std::make_unique<DiffWindow>(_device, _shader_storage, _font_factory, window());
         _diff_window->on_item_selected += on_item_selected;
+        _diff_window->on_trigger_selected += on_trigger_selected;
         _diff_window->on_version_selected += on_version_selected;
         _token_store += _diff_window->on_window_closed += [&]() { _closing = true; };
 
-        _diff_window->set_items(_left_items, _right_items);
         if (_diff.has_value())
         {
             _diff_window->set_diff(_diff.value());
-        }
-    }
-
-    void DiffWindowManager::set_items(const std::vector<Item>& left, const std::vector<Item>& right)
-    {
-        _left_items = left;
-        _right_items = right;
-        if (_diff_window)
-        {
-            _diff_window->set_items(_left_items, _right_items);
         }
     }
 
@@ -75,13 +65,10 @@ namespace trview
     void DiffWindowManager::clear_diff()
     {
         _diff.reset();
-        _left_items.clear();
-        _right_items.clear();
 
         if (_diff_window)
         {
             _diff_window->set_diff(Diff());
-            _diff_window->set_items(_left_items, _right_items);
         }
     }
 }

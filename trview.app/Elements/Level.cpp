@@ -626,6 +626,13 @@ namespace trview
     Diff Level::generate_diff(const Level& other) const
     {
         Diff diff;
+
+        diff.left_items = _items;
+        diff.right_items = other._items;
+
+        std::transform(_triggers.begin(), _triggers.end(), std::back_inserter(diff.left_triggers), [](const auto& t) { return t.get(); });
+        std::transform(other._triggers.begin(), other._triggers.end(), std::back_inserter(diff.right_triggers), [](const auto& t) { return t.get(); });
+
         uint32_t diff_index{ 0u };
 
         for (uint32_t i = 0; i < _items.size(); ++i)
