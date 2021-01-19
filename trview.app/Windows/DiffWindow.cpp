@@ -195,6 +195,7 @@ namespace trview
             const auto right = _diff.right_items[change.index];
 
             add_row(L"Type", left.type(), right.type());
+            add_row(L"Index", std::to_wstring(left.number()), std::to_wstring(right.number()));
             add_row(L"Position", to_string(left.position()), to_string(right.position()));
             add_row(L"Type ID", std::to_wstring(left.type_id()), std::to_wstring(right.type_id()));
             add_row(L"Room", std::to_wstring(left.room()), std::to_wstring(right.room()));
@@ -229,6 +230,7 @@ namespace trview
             const auto& right = *_diff.right_triggers[change.index];
 
             add_row(L"Type", trigger_type_name(left.type()), trigger_type_name(right.type()));
+            add_row(L"Index", std::to_wstring(left.number()), std::to_wstring(right.number()));
             add_row(L"Position", to_string(left.position()), to_string(right.position()));
             add_row(L"Room", std::to_wstring(left.room()), std::to_wstring(right.room()));
             add_row(L"Flags", format_binary(left.flags()), format_binary(right.flags()));
