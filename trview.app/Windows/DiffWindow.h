@@ -34,7 +34,6 @@ namespace trview
         Diff _diff;
         ui::Listbox* _diff_list{ nullptr };
         ui::Control* _items_diff{ nullptr };
-        ui::Window* _triggers_diff{ nullptr };
         ui::Window* _geometry_diff{ nullptr };
         ui::Listbox* _item_diff{ nullptr };
         ui::Button* _a_button{ nullptr };

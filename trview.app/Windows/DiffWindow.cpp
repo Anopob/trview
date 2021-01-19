@@ -90,7 +90,6 @@ namespace trview
             else if (type == L"Geometry")
             {
                 _items_diff->set_visible(false);
-                _triggers_diff->set_visible(false);
                 _geometry_diff->set_visible(true);
             }
         };
@@ -127,10 +126,6 @@ namespace trview
         // Different panels for different diff types.
         _items_diff = area->add_child(create_item_diff_panel());
 
-        _triggers_diff = area->add_child(std::make_unique<StackPanel>(Size(300, window().size().height), Colours::RightPanel));
-        _triggers_diff->set_visible(false);
-        _triggers_diff->add_child(std::make_unique<Label>(Size(100, 20), Colours::RightPanel, L"Triggers Diff...", 8));
-
         _geometry_diff = area->add_child(std::make_unique<StackPanel>(Size(300, window().size().height), Colours::RightPanel));
         _geometry_diff->set_visible(false);
         _geometry_diff->add_child(std::make_unique<Label>(Size(100, 20), Colours::RightPanel, L"Geometry Diff...", 8));
@@ -165,7 +160,6 @@ namespace trview
         _diff_list->set_items(list_items);
 
         _items_diff->set_visible(false);
-        _triggers_diff->set_visible(false);
         _geometry_diff->set_visible(false);
     }
 
@@ -182,7 +176,6 @@ namespace trview
     void DiffWindow::start_item_diff(const Diff::Change& change)
     {
         _items_diff->set_visible(true);
-        _triggers_diff->set_visible(false);
         _geometry_diff->set_visible(false);
 
         uint32_t i = 0;
@@ -216,10 +209,9 @@ namespace trview
 
     void DiffWindow::start_trigger_diff(const Diff::Change& change)
     {
-        _items_diff->set_visible(false);
-        _triggers_diff->set_visible(true);
+        _items_diff->set_visible(true);
         _geometry_diff->set_visible(false);
-        /*
+
         uint32_t i = 0;
         std::vector<ui::Listbox::Item> items;
         auto add_row = [&](auto name, auto left_value, auto right_value)
@@ -233,20 +225,26 @@ namespace trview
 
         if (change.type == Diff::Change::Type::Edit)
         {
-            const auto left = _diff.left_items[change.index];
-            const auto right = _diff.right_items[change.index];
+            const auto& left = *_diff.left_triggers[change.index];
+            const auto& right = *_diff.right_triggers[change.index];
 
-            add_row(L"Type", left.type(), right.type());
+            add_row(L"Type", trigger_type_name(left.type()), trigger_type_name(right.type()));
             add_row(L"Position", to_string(left.position()), to_string(right.position()));
-            add_row(L"Type ID", std::to_wstring(left.type_id()), std::to_wstring(right.type_id()));
             add_row(L"Room", std::to_wstring(left.room()), std::to_wstring(right.room()));
-            add_row(L"Clear Body", format_bool(left.clear_body_flag()), format_bool(right.clear_body_flag()));
-            add_row(L"Invisible", format_bool(left.invisible_flag()), format_bool(right.invisible_flag()));
-            add_row(L"Flags", format_binary(left.activation_flags()), format_binary(right.activation_flags()));
-            add_row(L"OCB", std::to_wstring(left.ocb()), std::to_wstring(right.ocb()));
+            add_row(L"Flags", format_binary(left.flags()), format_binary(right.flags()));
+            add_row(L"Only once", format_bool(left.only_once()), format_bool(right.only_once()));
+            add_row(L"Timer", std::to_wstring(left.timer()), std::to_wstring(right.timer()));
+
+            const auto lc = left.commands();
+            const auto rc = right.commands();
+            for (auto c = 0; c < std::max(lc.size(), rc.size()); ++c)
+            {
+                const auto left_text = c < lc.size() ? command_type_name(lc[c].type()) + L" - [" + std::to_wstring(lc[c].index()) + L"]" : L"None";
+                const auto right_text = c < rc.size() ? command_type_name(rc[c].type()) + L" - [" + std::to_wstring(rc[c].index()) + L"]" : L"None";
+                add_row(L"Command", left_text, right_text);
+            }
         }
 
         _item_diff->set_items(items);
-        */
     }
 }
