@@ -231,6 +231,7 @@ namespace trview
     bool Trigger::operator== (const Trigger& other) const
     {
         return number() == other.number() &&
+            position() == other.position() &&
             room() == other.room() &&
             flags() == other.flags() &&
             only_once() == other.only_once() &&
