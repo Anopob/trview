@@ -78,13 +78,19 @@ namespace trview
             if (type == L"Item")
             {
                 auto change = _diff.changes[std::stoi(item.value(L"#"))];
-                on_item_selected(_diff.left_items[change.index]);
+                if (change.index < _diff.left_items.size())
+                {
+                    on_item_selected(_diff.left_items[change.index]);
+                }
                 start_item_diff(change);
             }
             else if (type == L"Trigger")
             {
                 auto change = _diff.changes[std::stoi(item.value(L"#"))];
-                on_trigger_selected(_diff.left_triggers[change.index]);
+                if (change.index < _diff.left_triggers.size())
+                {
+                    on_trigger_selected(_diff.left_triggers[change.index]);
+                }
                 start_trigger_diff(change);
             }
             else if (type == L"Geometry")
@@ -204,6 +210,32 @@ namespace trview
             add_row(L"Flags", format_binary(left.activation_flags()), format_binary(right.activation_flags()));
             add_row(L"OCB", std::to_wstring(left.ocb()), std::to_wstring(right.ocb()));
         }
+        else if (change.type == Diff::Change::Type::Add)
+        {
+            const auto right = _diff.right_items[change.index];
+            add_row(L"Type", L"", right.type());
+            add_row(L"Index", L"", std::to_wstring(right.number()));
+            add_row(L"Position", L"", to_string(right.position()));
+            add_row(L"Type ID", L"", std::to_wstring(right.type_id()));
+            add_row(L"Room", L"", std::to_wstring(right.room()));
+            add_row(L"Clear Body", L"", format_bool(right.clear_body_flag()));
+            add_row(L"Invisible", L"", format_bool(right.invisible_flag()));
+            add_row(L"Flags", L"", format_binary(right.activation_flags()));
+            add_row(L"OCB", L"", std::to_wstring(right.ocb()));
+        }
+        else if (change.type == Diff::Change::Type::Delete)
+        {
+            const auto left = _diff.left_items[change.index];
+            add_row(L"Type", left.type(), L"");
+            add_row(L"Index", std::to_wstring(left.number()), L"");
+            add_row(L"Position", to_string(left.position()), L"");
+            add_row(L"Type ID", std::to_wstring(left.type_id()), L"");
+            add_row(L"Room", std::to_wstring(left.room()), L"");
+            add_row(L"Clear Body", format_bool(left.clear_body_flag()), L"");
+            add_row(L"Invisible", format_bool(left.invisible_flag()), L"");
+            add_row(L"Flags", format_binary(left.activation_flags()), L"");
+            add_row(L"OCB", std::to_wstring(left.ocb()), L"");
+        }
 
         _item_diff->set_items(items);
     }
@@ -244,6 +276,44 @@ namespace trview
                 const auto left_text = c < lc.size() ? command_type_name(lc[c].type()) + L" - [" + std::to_wstring(lc[c].index()) + L"]" : L"None";
                 const auto right_text = c < rc.size() ? command_type_name(rc[c].type()) + L" - [" + std::to_wstring(rc[c].index()) + L"]" : L"None";
                 add_row(L"Command", left_text, right_text);
+            }
+        }
+        else if (change.type == Diff::Change::Type::Add)
+        {
+            const auto& right = *_diff.right_triggers[change.index];
+
+            add_row(L"Type", L"", trigger_type_name(right.type()));
+            add_row(L"Index", L"", std::to_wstring(right.number()));
+            add_row(L"Position", L"", to_string(right.position()));
+            add_row(L"Room", L"", std::to_wstring(right.room()));
+            add_row(L"Flags", L"", format_binary(right.flags()));
+            add_row(L"Only once", L"", format_bool(right.only_once()));
+            add_row(L"Timer", L"", std::to_wstring(right.timer()));
+
+            const auto rc = right.commands();
+            for (auto c = 0; c < rc.size(); ++c)
+            {
+                const auto right_text = c < rc.size() ? command_type_name(rc[c].type()) + L" - [" + std::to_wstring(rc[c].index()) + L"]" : L"None";
+                add_row(L"Command", L"", right_text);
+            }
+        }
+        else if (change.type == Diff::Change::Type::Delete)
+        {
+            const auto& left = *_diff.left_triggers[change.index];
+
+            add_row(L"Type", trigger_type_name(left.type()), L"");
+            add_row(L"Index", std::to_wstring(left.number()), L"");
+            add_row(L"Position", to_string(left.position()), L"");
+            add_row(L"Room", std::to_wstring(left.room()), L"");
+            add_row(L"Flags", format_binary(left.flags()), L"");
+            add_row(L"Only once", format_bool(left.only_once()), L"");
+            add_row(L"Timer", std::to_wstring(left.timer()), L"");
+
+            const auto lc = left.commands();
+            for (auto c = 0; c < lc.size(); ++c)
+            {
+                const auto left_text = c < lc.size() ? command_type_name(lc[c].type()) + L" - [" + std::to_wstring(lc[c].index()) + L"]" : L"None";
+                add_row(L"Command", left_text, L"");
             }
         }
 
