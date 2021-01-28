@@ -93,7 +93,7 @@ namespace trview
 
     uint32_t Level::number_of_rooms() const
     {
-        return _rooms.size();
+        return static_cast<uint32_t>(_rooms.size ());
     }
 
     std::vector<Room*> Level::rooms() const

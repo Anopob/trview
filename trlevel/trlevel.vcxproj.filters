@@ -5,16 +5,18 @@
     <ClInclude Include="Level.h" />
     <ClInclude Include="trlevel.h" />
     <ClInclude Include="trtypes.h" />
-    <ClInclude Include="LevelVersion.h" />
     <ClInclude Include="LevelLoadException.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="LevelLoader.h" />
+    <ClInclude Include="LevelLoadUtils.h" />
+    <ClInclude Include="LevelTarget.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ILevel.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="trlevel.cpp" />
     <ClCompile Include="trtypes.cpp" />
-    <ClCompile Include="LevelVersion.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="LevelLoader.cpp" />
   </ItemGroup>
 </Project>

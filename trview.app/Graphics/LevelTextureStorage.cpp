@@ -1,5 +1,7 @@
 #include "LevelTextureStorage.h"
 #include "TextureStorage.h"
+#include "trlevel/LevelVersion.h"
+#include "trlevel/LevelTarget.h"
 
 namespace trview
 {
@@ -18,7 +20,7 @@ namespace trview
             _object_textures.push_back(level.get_object_texture(i));
         }
 
-        if (_version < trlevel::LevelVersion::Tomb4)
+        if (_version < trlevel::LevelVersion::Tomb4 )
         {
             using namespace DirectX::SimpleMath;
             for (uint32_t i = 0; i < 256; ++i)

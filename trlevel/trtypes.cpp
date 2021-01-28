@@ -70,6 +70,21 @@ namespace trlevel
         return new_vertices;
     }
 
+    std::vector<tr_vertex> convert_vertices ( std::vector<tr_vertex_psx> vertices )
+    {
+        std::vector<tr_vertex> new_vertices;
+        new_vertices.reserve ( vertices.size () );
+        std::transform (
+            vertices.begin (),
+            vertices.end (),
+            std::back_inserter ( new_vertices ),
+            [] ( const auto& vert )
+                {
+                return tr_vertex { vert.x, vert.y, vert.z };
+                });
+        return new_vertices;
+    }
+
     // Convert a set of Tomb Raider I lights into a light format compatible
     // with Tomb Raider III (what the viewer is currently using).
     std::vector<tr3_room_light> convert_lights(std::vector<tr_room_light> lights)
@@ -85,6 +100,21 @@ namespace trlevel
         return new_lights;
     }
 
+    // Convert a set of Tomb Raider I (PSX) lights into a light format compatible
+    // with Tomb Raider III (what the viewer is currently using).
+    std::vector<tr3_room_light> convert_lights ( std::vector<tr_room_light_psx> lights )
+    {
+        std::vector<tr3_room_light> new_lights;
+        new_lights.reserve ( lights.size () );
+        std::transform ( lights.begin (), lights.end (),
+            std::back_inserter ( new_lights ), [] ( const tr_room_light_psx& light )
+            {
+                tr3_room_light new_light { light.x, light.y, light.z, tr_colour4 {0xff, 0xff, 0xff, 0xff}, light.intensity };
+                return new_light;
+            });
+        return new_lights;
+    }
+
     // Convert a set of Tomb Raider I static meshes into a format compatible
     // with Tomb Raider III (what the viewer is currently using).
     std::vector<tr3_room_staticmesh> convert_room_static_meshes(std::vector<tr_room_staticmesh> meshes)
@@ -97,6 +127,19 @@ namespace trlevel
             tr3_room_staticmesh new_mesh{ mesh.x, mesh.y, mesh.z, mesh.rotation, 0xffff, 0, mesh.mesh_id };
             return new_mesh;
         });
+        return new_meshes;
+    }
+
+    std::vector<tr3_room_staticmesh> convert_room_static_meshes ( std::vector<tr_room_staticmesh_psx> meshes )
+    {
+        std::vector<tr3_room_staticmesh> new_meshes;
+        new_meshes.reserve ( meshes.size () );
+        std::transform ( meshes.begin (), meshes.end (),
+            std::back_inserter ( new_meshes ), [] ( const tr_room_staticmesh_psx& mesh )
+            {
+                tr3_room_staticmesh new_mesh { mesh.x, mesh.y, mesh.z, mesh.rotation, 0xffff, 0, mesh.mesh_id };
+                return new_mesh;
+            });
         return new_meshes;
     }
 
@@ -189,6 +232,19 @@ namespace trlevel
         new_models.reserve(models.size());
         std::transform(models.begin(), models.end(),
             std::back_inserter(new_models), [](const auto& model) { return model.model; });
+        return new_models;
+    }
+
+    std::vector<tr_model> convert_models ( std::vector<tr_model_psx> models )
+    {
+        std::vector<tr_model> new_models;
+        new_models.reserve ( models.size () );
+        std::transform ( models.begin (), models.end (),
+            std::back_inserter ( new_models ), [] ( const tr_model_psx& model )
+            { 
+                tr_model m { model.ID, model.NumMeshes, model.StartingMesh, model.MeshTree, model.FrameOffset, model.Animation };
+                return m;
+            });
         return new_models;
     }
 }

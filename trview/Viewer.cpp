@@ -554,11 +554,11 @@ namespace trview
         std::unique_ptr<trlevel::ILevel> new_level;
         try
         {
-            new_level = trlevel::load_level(filename);
+            new_level = trlevel::load_level ( filename );
         }
-        catch(...)
+        catch ( ... )
         {
-            MessageBox(_window.window(), L"Failed to load level", L"Error", MB_OK);
+            MessageBox ( _window.window (), L"Failed to load level", L"Error", MB_OK );
             return;
         }
 

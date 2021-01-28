@@ -118,6 +118,7 @@ namespace trview
         // Get the first sprite image.
         auto sprite = level.get_sprite_texture(sprite_sequence.Offset);
         auto texture = texture_storage.texture(sprite.Tile);
+        
 
         // Calculate UVs.
         float u = static_cast<float>(sprite.x) / 256.0f;

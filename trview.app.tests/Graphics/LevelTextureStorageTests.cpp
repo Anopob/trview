@@ -39,6 +39,7 @@ namespace
         MOCK_CONST_METHOD2(get_meshtree, std::vector<tr_meshtree_node>(uint32_t, uint32_t));
         MOCK_CONST_METHOD2(get_frame, tr2_frame(uint32_t, uint32_t));
         MOCK_CONST_METHOD0(get_version, LevelVersion());
+        MOCK_CONST_METHOD0(get_target_platform, LevelTarget());
         MOCK_CONST_METHOD2(get_sprite_sequence_by_id, bool(int32_t, tr_sprite_sequence&));
         MOCK_CONST_METHOD1(get_sprite_texture, tr_sprite_texture(uint32_t));
         MOCK_CONST_METHOD2(find_first_entity_by_type, bool(int16_t, tr2_entity&));

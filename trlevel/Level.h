@@ -7,16 +7,13 @@
 
 #include "ILevel.h"
 #include "trtypes.h"
+#include "LevelLoader.h"
 
 namespace trlevel
 {
     class Level : public ILevel
     {
     public:
-        explicit Level(const std::string& filename);
-
-        virtual ~Level();
-
         // Get the entry from the 8 bit palette at the given index.
         // index: The 0-255 index into the palette.
         // Returns: The palette colour.
@@ -42,6 +39,10 @@ namespace trlevel
         // Gets the number of textiles in the level.
         // Returns: The number of textiles.
         virtual uint32_t num_textiles() const override;
+
+        virtual tr_textile4 get_textile4 ( uint32_t index ) const; 
+
+        virtual tr_clut get_clut ( uint32_t index ) const;
 
         // Gets the 8 bit textile with the specified index.
         // Returns: The textile for this index.
@@ -142,6 +143,10 @@ namespace trlevel
         // Returns: The level version.
         virtual LevelVersion get_version() const override;
 
+        // Get the platform (PC, PSX, etc.) that this level was built for.
+        // Returns: The platform.
+        virtual LevelTarget get_target_platform () const override;
+
         // Get the sprite squence with the specified ID.
         // sprite_sequence_id: The id of the sprite sequence to find.
         // sequence: The place to store the sequence.
@@ -164,19 +169,15 @@ namespace trlevel
         /// @returns The mesh index for the type.
         virtual int16_t get_mesh_from_type_id(int16_t type) const override;
     private:
-        void generate_meshes(const std::vector<uint16_t>& mesh_data);
-
-        // Load a Tomb Raider IV level.
-        void load_tr4(std::ifstream& file);
-
-        void load_level_data(std::istream& file);
-
         LevelVersion _version;
+        LevelTarget _target_platform;
 
         std::vector<tr_colour>  _palette;
         std::vector<tr_colour4> _palette16;
+        std::vector<tr_clut>    _clut;
 
         uint32_t                  _num_textiles;
+        std::vector<tr_textile4>  _textile4;
         std::vector<tr_textile8>  _textile8;
         std::vector<tr_textile16> _textile16;
         std::vector<tr_textile32> _textile32;
@@ -199,5 +200,7 @@ namespace trlevel
         std::vector<uint16_t>                 _frames;
         std::vector<tr_sprite_texture>        _sprite_textures;
         std::vector<tr_sprite_sequence>       _sprite_sequences;
+
+        friend class LevelLoader;
     };
 }

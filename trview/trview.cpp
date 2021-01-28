@@ -188,7 +188,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 ofn.lpstrFile = path;
                 ofn.nMaxFile = MAX_PATH;
                 ofn.lpstrTitle = L"Open level";
-                ofn.lpstrFilter = L"All Tomb Raider Files\0*.tr*;*.phd\0";
+                ofn.lpstrFilter = L"All Tomb Raider Files\0*.tr*;*.phd;*.psx\0";
                 ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
                 if (GetOpenFileName(&ofn))

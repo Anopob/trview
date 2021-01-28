@@ -46,6 +46,7 @@ namespace
         MOCK_METHOD(std::vector<tr_meshtree_node>, get_meshtree, (uint32_t, uint32_t), (const, override));
         MOCK_METHOD(tr2_frame, get_frame, (uint32_t, uint32_t), (const, override));
         MOCK_METHOD(LevelVersion, get_version, (), (const, override));
+        MOCK_METHOD ( LevelTarget, get_target_platform, (), (const, override) );
         MOCK_METHOD(bool, get_sprite_sequence_by_id, (int32_t, tr_sprite_sequence&), (const, override));
         MOCK_METHOD(tr_sprite_texture, get_sprite_texture, (uint32_t), (const, override));
         MOCK_METHOD(bool, find_first_entity_by_type, (int16_t, tr2_entity&), (const, override));
