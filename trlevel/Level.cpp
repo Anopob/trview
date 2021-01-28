@@ -207,7 +207,7 @@ namespace trlevel
 
     uint32_t Level::num_mesh_pointers() const
     {
-        return static_cast<uint32_t>(_mesh_pointers.size ());
+        return static_cast<uint32_t>(_mesh_pointers.size());
     }
 
     tr_mesh Level::get_mesh_by_pointer(uint32_t mesh_pointer) const

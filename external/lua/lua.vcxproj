@@ -22,7 +22,6 @@
     <ClCompile Include="src\lapi.c" />
     <ClCompile Include="src\lauxlib.c" />
     <ClCompile Include="src\lbaselib.c" />
-    <ClCompile Include="src\lbitlib.c" />
     <ClCompile Include="src\lcode.c" />
     <ClCompile Include="src\lcorolib.c" />
     <ClCompile Include="src\lctype.c" />
@@ -48,8 +47,6 @@
     <ClCompile Include="src\ltable.c" />
     <ClCompile Include="src\ltablib.c" />
     <ClCompile Include="src\ltm.c" />
-    <ClCompile Include="src\lua.c" />
-    <ClCompile Include="src\luac.c" />
     <ClCompile Include="src\lundump.c" />
     <ClCompile Include="src\lutf8lib.c" />
     <ClCompile Include="src\lvm.c" />
