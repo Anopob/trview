@@ -428,7 +428,7 @@ namespace trlevel
 			for ( int y = 0; y < 256; y++ )
 			{
 				tr_colorindex4 index = t4.Tile [(y * 256 + x) / 2];
-				uint8_t i = (x % 2) ? index.a : index.b;
+				uint8_t i = (x % 2) ? index.b : index.a;
 				tr_rgba5551 col = clut.Colour [i];
 				t16.Tile [y * 256 + x] = (col.Alpha << 15) | (col.Red << 10) | (col.Green << 5) | col.Blue;
 			}
