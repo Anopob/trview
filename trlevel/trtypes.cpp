@@ -183,6 +183,26 @@ namespace trlevel
         return new_object_textures;
     }
 
+    std::vector<tr_object_texture> convert_object_textures ( std::vector<tr_object_texture_psx> object_textures )
+    {
+        std::vector<tr_object_texture> new_object_textures;
+        std::transform (
+            object_textures.begin (),
+            object_textures.end (),
+            std::back_inserter ( new_object_textures ),
+            [] ( const tr_object_texture_psx& texture )
+                {
+                return tr_object_texture { texture.Attribute, texture.Tile,
+                    {
+                        { 0, texture.x0, 0, texture.y0 },
+                        { 0, texture.x1, 0, texture.y1 },
+                        { 0, texture.x2, 0, texture.y2 },
+                        { 0, texture.x3, 0, texture.y3 },
+                    } }; // Vertices
+                });
+        return new_object_textures;
+    }
+
     std::vector<tr4_mesh_face3> convert_triangles(std::vector<tr_face3> triangles)
     {
         std::vector<tr4_mesh_face3> new_triangles;

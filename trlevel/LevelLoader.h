@@ -37,14 +37,17 @@ namespace trlevel
 		LevelVersion _version;
 		LevelTarget _target_platform;
 		uint32_t _actual_textile_count;
-		std::vector<std::pair<uint16_t, uint16_t>> _cache;
+		std::vector<std::pair<uint16_t, uint16_t>> _converted_t16;
+		
+		// takes a textile4 (used on PSX) with a CLUT index, and converts it to a textile16, for use with trview.
+		uint16_t convert_textile4(uint16_t tile, uint16_t clut_id);
 
-		static bool is_known_version ( uint32_t version );
-		std::size_t conv4 ( uint16_t tile, uint16_t clut_id );
-		void generate_meshes ( const std::vector<uint16_t>& mesh_data );
-		void read_tr1_4_room ( tr3_room& room );
-		void read_tr5_room ( tr3_room& room );
-		bool is_tr5 ();
+		static bool is_known_version(uint32_t version);
+		void generate_meshes(const std::vector<uint16_t>& mesh_data);
+		void read_tr1_4_room(tr3_room& room);
+		void read_tr5_room(tr3_room& room);
+		bool is_tr5();
+
 		void read_palette ();
 		void read_textiles ();
 		void read_rooms (); 

@@ -367,6 +367,34 @@ namespace trlevel
 		}
 	}
 
+	uint16_t LevelLoader::convert_textile4(uint16_t tile, uint16_t clut_id)
+	{
+		// Check if we've already converted this tile + clut
+		for ( auto i = _converted_t16.begin(); i < _converted_t16.end(); ++i )
+		{
+			if ( i->first == tile && i->second == clut_id )
+			{
+				return std::distance ( _converted_t16.begin(), i );
+			}
+		}
+		// If not, create new conversion
+		_converted_t16.push_back ( std::make_pair ( tile, clut_id ) );
+
+		const tr_textile4& tile4 = _level->get_textile4 ( tile );
+		const tr_clut& clut = _level->get_clut ( clut_id );
+		tr_textile16 tile16;
+		for ( int x = 0; x < 256; ++x )
+			for ( int y = 0; y < 256; ++y )
+			{
+				const std::size_t pixel = ( y * 256 + x );
+				const tr_colorindex4& index = tile4.Tile [pixel / 2];
+				const tr_rgba5551& colour = clut.Colour [ ( x % 2 ) ? index.b : index.a ];
+				tile16.Tile [pixel] = ( colour.Alpha << 15 ) | ( colour.Red << 10 ) | ( colour.Green << 5 ) | colour.Blue;
+			}
+		_level->_textile16.push_back ( tile16 );
+		return _level->_textile16.size () - 1;
+	}
+
 	void LevelLoader::read_object_textures ()
 	{
 		if ( _version == LevelVersion::Tomb1 || _version == LevelVersion::Tomb2 || _version == LevelVersion::Tomb3 )
@@ -374,26 +402,17 @@ namespace trlevel
 			if ( _target_platform == LevelTarget::PSX )
 			{
 				auto textures = read_vector<uint32_t, tr_object_texture_psx> ( *_data );
-				std::transform (
-					textures.begin (),
-					textures.end (),
-					std::back_inserter ( _level->_object_textures ),
-					[this] ( const tr_object_texture_psx& texture )
-						{
-						uint16_t converted = static_cast<uint16_t>(conv4 ( texture.Tile, texture.Clut ));
-						tr_object_texture t
-							{
-							texture.Attribute,
-							converted, 
-								{
-									{ 0, texture.x0, 0, texture.y0 }, 
-									{ 0, texture.x1, 0, texture.y1 },
-									{ 0, texture.x3, 0, texture.y3 },
-									{ 0, texture.x2, 0, texture.y2 },
-								}
-							};
-						return t;
-						} );
+				for ( auto& texture : textures )
+				{
+					texture.Tile = convert_textile4 ( texture.Tile, texture.Clut );
+					texture.Clut = 0U; // Unneeded after conversion
+					if ( texture.x3 || texture.y3 )
+					{
+						std::swap ( texture.x2, texture.x3 );
+						std::swap ( texture.y2, texture.y3 );
+					}
+				}
+				_level->_object_textures = convert_object_textures ( textures );
 			}
 			else 
 				_level->_object_textures = read_vector<uint32_t, tr_object_texture> ( *_data );
@@ -406,36 +425,6 @@ namespace trlevel
 		{
 			_level->_object_textures = convert_object_textures ( read_vector<uint32_t, tr5_object_texture> ( *_data ) );
 		}
-	}
-
-	std::size_t LevelLoader::conv4 ( uint16_t tile, uint16_t clut_id )
-	{
-		auto pair = std::make_pair ( tile, clut_id );
-		auto found = std::find ( _cache.begin (), _cache.end (), pair );
-
-		if ( found != _cache.end () )
-			return std::distance ( _cache.begin (), found );
-
-
-		// else we need to create a new textile 
-		std::size_t new_index = _level->_textile16.size ();
-		tr_textile4 t4 = _level->_textile4 [tile];
-		tr_clut clut = _level->_clut [clut_id];
-		tr_textile16 t16;
-
-		for ( int x = 0; x < 256; x++ )
-		{
-			for ( int y = 0; y < 256; y++ )
-			{
-				tr_colorindex4 index = t4.Tile [(y * 256 + x) / 2];
-				uint8_t i = (x % 2) ? index.b : index.a;
-				tr_rgba5551 col = clut.Colour [i];
-				t16.Tile [y * 256 + x] = (col.Alpha << 15) | (col.Red << 10) | (col.Green << 5) | col.Blue;
-			}
-		}
-		_level->_textile16.push_back ( t16 );
-		_cache.push_back ( pair );
-		return new_index;
 	}
 
 	void LevelLoader::read_sprites ()
@@ -459,8 +448,8 @@ namespace trlevel
 				std::back_inserter ( _level->_sprite_textures ),
 				[this] ( const tr_sprite_texture_psx& texture )
 					{
-					auto converted = static_cast<uint16_t>(conv4 ( texture.Tile, texture.Clut ));
-					tr_sprite_texture t { converted, texture.u0, texture.v0, 256, 256, texture.LeftSide, texture.TopSide, texture.RightSide, texture.BottomSide };
+					uint16_t tile = convert_textile4 ( texture.Tile, texture.Clut );
+					tr_sprite_texture t { tile, texture.u0, texture.v0, 256, 256, texture.LeftSide, texture.TopSide, texture.RightSide, texture.BottomSide };
 					return t;
 					} );
 		}

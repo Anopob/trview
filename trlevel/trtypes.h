@@ -811,6 +811,11 @@ struct tr_object_texture_psx
     /// @returns The converted texture.
     std::vector<tr_object_texture> convert_object_textures(std::vector<tr5_object_texture> object_textures);
 
+    /// Convert a set of PSX object textures into a format compatible with TR3 (what the viewer is currently using).
+    /// @param object_textures The textures to convert.
+    /// @returns The converted texture.
+    std::vector<tr_object_texture> convert_object_textures ( std::vector<tr_object_texture_psx> object_textures );
+
     // Convert a set of Tomb Raider I-III triangles to TRIV triangles.
     std::vector<tr4_mesh_face3> convert_triangles(std::vector<tr_face3> triangles);
 
