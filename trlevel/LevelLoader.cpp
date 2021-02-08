@@ -448,8 +448,10 @@ namespace trlevel
 				std::back_inserter ( _level->_sprite_textures ),
 				[this] ( const tr_sprite_texture_psx& texture )
 					{
-					uint16_t tile = convert_textile4 ( texture.Tile, texture.Clut );
-					tr_sprite_texture t { tile, texture.u0, texture.v0, 256, 256, texture.LeftSide, texture.TopSide, texture.RightSide, texture.BottomSide };
+					const uint16_t tile = convert_textile4 ( texture.Tile, texture.Clut );
+					const uint16_t width = ( texture.u1 - texture.u0 ) * 256 + 255;
+					const uint16_t height = ( texture.v1 - texture.v0 ) * 256 + 255;
+					tr_sprite_texture t { tile, texture.u0, texture.v0, width, height, texture.LeftSide, texture.TopSide, texture.RightSide, texture.BottomSide };
 					return t;
 					} );
 		}
