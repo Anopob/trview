@@ -74,4 +74,61 @@ namespace trlevel
     {
         skip ( file, 4 );
     }
+ 
+    std::vector<tr4_mesh_face4> read_psx_tr2_face4 ( std::istream& file, std::streamoff off )
+    {
+        // skip padding
+        file.seekg ( 2, SEEK_CUR );
+
+        int16_t count = read<int16_t> ( file );
+
+        std::vector<tr4_mesh_face4> vec;
+        vec.resize ( count );
+
+        if ( count )
+        {
+            for ( int i = 0; i < count; ++i )
+            {
+                vec [i].texture = read<uint16_t> ( file );
+            }
+            if ( ( file.tellg () - off ) % 4 )
+            {
+                file.seekg ( 2, SEEK_CUR );
+            }
+            for ( int i = 0; i < count; ++i )
+            {
+                for ( int v = 0; v < 4; ++v )
+                {
+                    vec [i].vertices [v] = read<uint16_t> ( file ) >> 2;
+                }
+            }
+        }
+
+        return vec;
+    }
+    
+    std::vector<tr4_mesh_face3> read_psx_tr2_face3 ( std::istream& file, std::streamoff off )
+    {
+        int16_t count = read<int16_t> ( file );
+
+        // skip padding
+        file.seekg ( 2, SEEK_CUR );
+
+        std::vector<tr4_mesh_face3> vec;
+        vec.resize ( count );
+
+        if ( count )
+        {
+            for ( int i = 0; i < count; ++i )
+            {
+                vec [i].texture = read<uint16_t> ( file );
+
+                for ( int v = 0; v < 3; ++v )
+                {
+                    vec [i].vertices [v] = read<uint16_t> ( file ) >> 2;
+                }
+            }
+        }
+        return vec;
+    }
 }

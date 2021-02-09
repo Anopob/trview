@@ -19,6 +19,7 @@ namespace trlevel
 		TR4_PC1 = 0x00345254,
 		TR4_PC2 = 0x63345254,
 		TR1_PSX = 0x56414270,
+		TR2_PSX = 0x00000089,
 	};
 
 	class Level;
@@ -46,8 +47,12 @@ namespace trlevel
 		void generate_meshes(const std::vector<uint16_t>& mesh_data);
 		void read_tr1_4_room(tr3_room& room);
 		void read_tr5_room(tr3_room& room);
+		
 		bool is_tr5();
+		bool is_psx () const;
+		bool is_pc () const;
 
+		void read_psx_header ();
 		void read_palette ();
 		void read_textiles ();
 		void read_rooms (); 

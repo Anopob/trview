@@ -70,6 +70,28 @@ namespace trlevel
         return new_vertices;
     }
 
+    // Convert a set of Tomb Raider II (PSX) vertices into a vertex format compatible
+    // with Tomb Raider III (what the viewer is currently using).
+    std::vector<tr3_room_vertex> convert_vertices ( std::vector<tr2_psx_room_vertex> vertices )
+    {
+        std::vector<tr3_room_vertex> new_vertices;
+        new_vertices.reserve ( vertices.size () );
+        std::transform (
+            vertices.begin (),
+            vertices.end (),
+            std::back_inserter ( new_vertices ),
+            [] ( const tr2_psx_room_vertex& vertex )
+                {
+                tr_vertex v1 { vertex.x << 10, vertex.y << 8, vertex.z << 10 };
+                return tr3_room_vertex { 
+                    v1, 
+                    static_cast<int16_t> (0x1FFF - (vertex.lighting << 5)), 
+                    static_cast<uint16_t> (vertex.attributes), 
+                    0xFFFF };
+                });
+        return new_vertices;
+    }
+
     std::vector<tr_vertex> convert_vertices ( std::vector<tr_vertex_psx> vertices )
     {
         std::vector<tr_vertex> new_vertices;

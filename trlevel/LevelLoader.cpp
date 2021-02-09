@@ -24,7 +24,18 @@ namespace trlevel
 			|| version == TR3_PC3
 			|| version == TR4_PC1
 			|| version == TR4_PC2
-			|| version == TR1_PSX;
+			|| version == TR1_PSX
+			|| version == TR2_PSX;
+	}
+
+	bool LevelLoader::is_psx () const
+	{
+		return _target_platform == LevelTarget::PSX;
+	}
+
+	bool LevelLoader::is_pc () const
+	{
+		return _target_platform == LevelTarget::PC;
 	}
 
 	bool LevelLoader::is_tr5 ()
@@ -43,67 +54,125 @@ namespace trlevel
 		}
 	}
 
-	void LevelLoader::read_textiles ()
+	void LevelLoader::read_psx_header ()
 	{
-		if ( _version == LevelVersion::Tomb1 && _target_platform == LevelTarget::PSX )
+		if ( !is_psx() )
+			return;
+
+		switch ( _version )
 		{
+		case LevelVersion::Tomb1:
+			{
 			uint32_t offsetTextiles;
 			_data->seekg ( 8, SEEK_CUR );
 			offsetTextiles = read<uint32_t> ( *_data );
 			_data->seekg ( offsetTextiles + 8, SEEK_SET );
-
-			_level->_textile4 = read_vector<tr_textile4, uint16_t> ( *_data, 13 );
-			_level->_clut = read_vector<tr_clut, uint16_t> ( *_data, 1024 );
-
-			read<uint32_t> ( *_data ); // Padding
-		}
-		else if ( _version <= LevelVersion::Tomb3 )
-		{
-			_level->_num_textiles = read<uint32_t> ( *_data );
-
-			for ( uint32_t i = 0; i < _level->_num_textiles; ++i )
+			break;
+			}
+		case LevelVersion::Tomb2:
 			{
-				_level->_textile8.emplace_back ( read<tr_textile8> ( *_data ) );
+			uint32_t sound_offsets_count = read<uint32_t> ( *_data );
+			std::vector<uint32_t> sound_offsets = read_vector<uint32_t, int32_t> ( *_data, sound_offsets_count + 1 );
+			std::vector<uint32_t> sound_size;
+			std::size_t sound_data_size = 0;
+
+			sound_size.reserve ( sound_offsets_count );
+
+			for ( int i = 0; i < sound_offsets_count; ++i )
+			{
+				sound_size.push_back ( sound_offsets [i + 1] - sound_offsets [i] );
+				sound_offsets [i] = sound_data_size;
+				sound_data_size += sound_size [i];
 			}
 
-			if ( _version != LevelVersion::Tomb1 )
+			auto sound_data = read_vector<uint8_t, std::size_t> ( *_data, sound_data_size );
+			_data->seekg ( 4, SEEK_CUR );
+			}
+		default:
+			break;
+		}
+	}
+
+	void LevelLoader::read_textiles ()
+	{
+		if ( is_psx() )
+		{
+			switch ( _version )
 			{
+			case LevelVersion::Tomb1:
+				{
+				_level->_textile4 = read_vector<tr_textile4, uint16_t> ( *_data, 13 );
+				_level->_clut = read_vector<tr_clut, uint16_t> ( *_data, 1024 );
+
+				break;
+				}
+			case LevelVersion::Tomb2:
+				{
+				_level->_textile4 = read_vector<int32_t, tr_textile4> ( *_data );
+
+				uint32_t cluts = read<uint32_t> ( *_data );
+
+				if ( cluts > 1024 )
+				{
+					_data->seekg ( -2, SEEK_CUR );
+					cluts = read<int32_t> ( *_data );
+				}
+	
+				_level->_clut = read_vector<tr_clut, int32_t> ( *_data, cluts );
+				break;
+				}
+			}
+			read<uint32_t> ( *_data ); // Padding
+		}
+		else
+		{
+			if ( _version <= LevelVersion::Tomb3 )
+			{
+				_level->_num_textiles = read<uint32_t> ( *_data );
+
 				for ( uint32_t i = 0; i < _level->_num_textiles; ++i )
 				{
-					_level->_textile16.emplace_back ( read<tr_textile16> ( *_data ) );
+					_level->_textile8.emplace_back ( read<tr_textile8> ( *_data ) );
+				}
+
+				if ( _version != LevelVersion::Tomb1 )
+				{
+					for ( uint32_t i = 0; i < _level->_num_textiles; ++i )
+					{
+						_level->_textile16.emplace_back ( read<tr_textile16> ( *_data ) );
+					}
+				}
+			}
+			else // TR4, TR5
+			{
+				uint16_t num_room_textiles = read<uint16_t> ( *_data );
+				uint16_t num_obj_textiles = read<uint16_t> ( *_data );
+				uint16_t num_bump_textiles = read<uint16_t> ( *_data );
+				_level->_num_textiles = num_room_textiles + num_obj_textiles + num_bump_textiles;
+				_level->_textile32 = read_vector_compressed<tr_textile32> ( *_data, _level->_num_textiles );
+				_level->_textile16 = read_vector_compressed<tr_textile16> ( *_data, _level->_num_textiles );
+				auto textile32_misc = read_vector_compressed<tr_textile32> ( *_data, 2 );
+
+				if ( _version == LevelVersion::Tomb5 )
+				{
+					_level->_lara_type = read<uint16_t> ( *_data );
+					_level->_weather_type = read<uint16_t> ( *_data );
+					_data->seekg ( 28, std::ios::cur );
+				}
+
+				if ( _version == LevelVersion::Tomb4 )
+				{
+					std::vector<uint8_t> level_data = read_compressed ( *_data );
+					std::string data ( reinterpret_cast< char* >( &level_data [0] ), level_data.size () );
+					std::istringstream data_stream ( data, std::ios::binary );
+					_data = std::make_unique<std::istringstream> ( data, std::ios::binary );
+				}
+				else
+				{
+					_data->seekg ( 8, SEEK_CUR );
 				}
 			}
 		}
-		else // TR4, TR5
-		{
-			uint16_t num_room_textiles = read<uint16_t>(*_data);
-			uint16_t num_obj_textiles = read<uint16_t>(*_data);
-			uint16_t num_bump_textiles = read<uint16_t>(*_data);
-			_level->_num_textiles = num_room_textiles + num_obj_textiles + num_bump_textiles;
-			_level->_textile32 = read_vector_compressed<tr_textile32>(*_data, _level->_num_textiles);
-			_level->_textile16 = read_vector_compressed<tr_textile16>(*_data, _level->_num_textiles);
-			auto textile32_misc = read_vector_compressed<tr_textile32>(*_data, 2);
-
-			if (_version == LevelVersion::Tomb5)
-			{
-			    _level->_lara_type = read<uint16_t>(*_data);
-			    _level->_weather_type = read<uint16_t>(*_data);
-			    _data->seekg(28, std::ios::cur);
-			}
-
-			if (_version == LevelVersion::Tomb4)
-			{
-			    std::vector<uint8_t> level_data = read_compressed(*_data);
-			    std::string data(reinterpret_cast<char*>(&level_data[0]), level_data.size());
-			    std::istringstream data_stream(data, std::ios::binary);
-				_data = std::make_unique<std::istringstream> ( data, std::ios::binary );
-			}
-			else
-			{
-				_data->seekg ( 8, SEEK_CUR );
-			}
-		}
-		
 	}
 
 	void LevelLoader::read_rooms () 
@@ -136,25 +205,47 @@ namespace trlevel
 		room.info = convert_room_info ( read<tr1_4_room_info> ( *_data ) );
 
 		uint32_t NumDataWords = read<uint32_t> ( *_data );
+		std::streampos start_offset = _data->tellg ();
 
-		if ( _version == LevelVersion::Tomb1 && _target_platform == LevelTarget::PSX )
+		if ( is_psx () && _version == LevelVersion::Tomb1 )
 			read<uint16_t> ( *_data ); // Padding
 	
 		// Read actual room data.
 		if ( NumDataWords > 0 )
 		{
-			if ( _version == LevelVersion::Tomb1 )
+			if ( is_psx () && _version == LevelVersion::Tomb2 )
 			{
-				room.data.vertices = convert_vertices ( read_vector<int16_t, tr_room_vertex> ( *_data ) );
+				room.data.vertices = convert_vertices ( read_vector<int16_t, tr2_psx_room_vertex> ( *_data ) );
+				
+				for ( auto& v : room.data.vertices )
+				{
+					v.vertex.y += room.info.yTop;
+				}
+
+				room.data.rectangles = read_psx_tr2_face4 ( *_data, start_offset );
+				room.data.triangles = read_psx_tr2_face3 ( *_data, start_offset );
 			}
 			else
 			{
-				room.data.vertices = read_vector<int16_t, tr3_room_vertex> ( *_data );
+				if ( _version == LevelVersion::Tomb1 )
+				{
+					room.data.vertices = convert_vertices ( read_vector<int16_t, tr_room_vertex> ( *_data ) );
+				}
+				else
+				{
+					room.data.vertices = read_vector<int16_t, tr3_room_vertex> ( *_data );
+				}
+				room.data.rectangles = convert_rectangles ( read_vector<int16_t, tr_face4> ( *_data ) );
+				room.data.triangles = convert_triangles ( read_vector<int16_t, tr_face3> ( *_data ) );
 			}
-			room.data.rectangles = convert_rectangles ( read_vector<int16_t, tr_face4> ( *_data ) );
-			room.data.triangles = convert_triangles ( read_vector<int16_t, tr_face3> ( *_data ) );
-			room.data.sprites = read_vector<int16_t, tr_room_sprite> ( *_data );
 
+
+			if ( !is_psx () || ( _version != LevelVersion::Tomb2 && _version != LevelVersion::Tomb3 ) ) // no room sprites in tr2/tr3 psx
+			{
+				room.data.sprites = read_vector<int16_t, tr_room_sprite> ( *_data );
+			}
+			
+		
 			if ( _target_platform == LevelTarget::PSX )
 				for ( auto& rectangle : room.data.rectangles )
 				{
@@ -168,7 +259,21 @@ namespace trlevel
 				}
 		}
 
+		const std::streampos new_pos = start_offset + static_cast< std::streampos >( NumDataWords ) * 2;
+		_data->seekg ( new_pos, SEEK_SET );
+
 		room.portals = read_vector<uint16_t, tr_room_portal> ( *_data );
+
+		if ( is_psx () && ( _version == LevelVersion::Tomb2 || _version == LevelVersion::Tomb3 ) )
+		{
+			for ( auto& portal : room.portals )
+			{
+				for ( int i = 0; i < 4; ++i )
+				{
+					portal.vertices [i].y += room.info.yTop;
+				}
+			}
+		}
 
 		room.num_z_sectors = read<uint16_t> ( *_data );
 		room.num_x_sectors = read<uint16_t> ( *_data );
@@ -212,10 +317,14 @@ namespace trlevel
 
 		if ( _version == LevelVersion::Tomb1 )
 		{
-			room.static_meshes = 
-				_target_platform == LevelTarget::PSX
-				? convert_room_static_meshes ( read_vector<uint16_t, tr_room_staticmesh_psx> ( *_data ) )
-				: convert_room_static_meshes ( read_vector<uint16_t, tr_room_staticmesh> ( *_data ) );
+			if ( is_psx () )
+			{
+				room.static_meshes = convert_room_static_meshes ( read_vector<uint16_t, tr_room_staticmesh_psx> ( *_data ) );
+			}
+			else
+			{
+				room.static_meshes = convert_room_static_meshes ( read_vector<uint16_t, tr_room_staticmesh> ( *_data ) );
+			}
 		}
 		else
 		{
@@ -626,7 +735,8 @@ namespace trlevel
 
 			tr_mesh mesh;
 			mesh.centre = read<tr_vertex> ( stream );
-			mesh.coll_radius = read<int32_t> ( stream );
+			mesh.coll_radius = read<int16_t> ( stream );
+			read<int16_t> ( stream ); // flags,unused
 
 			if ( _target_platform == LevelTarget::PSX )
 			{
@@ -634,13 +744,13 @@ namespace trlevel
 				int16_t normals_count = vertices_count;
 				vertices_count = static_cast<int16_t>(std::abs ( vertices_count ));
 
-				mesh.vertices = convert_vertices ( read_vector<tr_vertex_psx, uint16_t> ( stream, vertices_count) );
+				mesh.vertices = convert_vertices ( read_vector<tr_vertex_psx, int16_t> ( stream, vertices_count) );
+
 				for ( int i = 0; i < vertices_count; ++i )
 				{
 					if ( normals_count > 0 )
 					{
-						tr_vertex_psx norm;
-						norm = read<tr_vertex_psx> ( stream );
+						tr_vertex_psx norm = read<tr_vertex_psx> ( stream );
 						norm.w = 1;
 						mesh.normals.push_back ( { norm.x, norm.y, norm.z } );
 					}
@@ -650,8 +760,34 @@ namespace trlevel
 						mesh.normals.push_back ( { 0, 0, 0 } );
 					}
 				}
+
+				if ( _version == LevelVersion::Tomb2 && normals_count > 0 )
+				{
+					const uint16_t face4_count = read<uint16_t> ( stream );
+					_data->seekg ( 12 * face4_count, SEEK_CUR );
+					const uint16_t face3_count = read<uint16_t> ( stream );
+					_data->seekg ( 10 * face4_count, SEEK_CUR );
+				}
+
 				mesh.textured_rectangles = convert_rectangles ( read_vector<int16_t, tr_face4> ( stream ) );
 				mesh.textured_triangles = convert_triangles ( read_vector<int16_t, tr_face3> ( stream ) );
+				if ( _version == LevelVersion::Tomb2 )
+				{
+					for ( auto& mesh : mesh.textured_rectangles )
+					{
+						for ( int i = 0; i < 4; ++i )
+						{
+							mesh.vertices [i] >>= 3;
+						}
+					}
+					for ( auto& mesh : mesh.textured_triangles )
+					{
+						for ( int i = 0; i < 3; ++i )
+						{
+							mesh.vertices [i] >>= 3;
+						}
+					}
+				}
 			}
 			else
 			{
@@ -691,6 +827,8 @@ namespace trlevel
 		if ( !is_known_version ( version ) )
 			version = read <uint32_t> ( *_data );
 
+		
+
 		switch ( version )
 		{
 		case TR1_PC:
@@ -716,13 +854,24 @@ namespace trlevel
 			_target_platform = LevelTarget::PSX;
 			_version = LevelVersion::Tomb1;
 			break;
+		default: 
+			if ( static_cast<int>(_version) == 0 )
+			{
+				// temp crap code
+				_target_platform = LevelTarget::PSX;
+				_version = LevelVersion::Tomb2;
+				_data->seekg ( 0, SEEK_SET );
+			}
+			break;
 		}
 
 		switch ( _target_platform )
 		{
 		case LevelTarget::PSX:
 			{
-			read_textiles ();
+			read_psx_header ();
+			if ( _version == LevelVersion::Tomb1 )
+				read_textiles ();
 			read_rooms ();
 			read_floor_data ();
 			read_mesh_data ();
@@ -731,6 +880,8 @@ namespace trlevel
 			read_frames ();
 			read_models ();
 			read_statics ();
+			if ( _version == LevelVersion::Tomb2 )
+				read_textiles ();
 			read_object_textures ();
 			read_sprites ();
 			read_cameras ();

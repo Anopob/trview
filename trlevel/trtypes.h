@@ -481,6 +481,16 @@ struct tr_object_texture_psx
         int16_t   lighting;
     };
 
+    struct tr2_psx_room_vertex
+    {
+        uint32_t lighting : 8
+               , attributes : 8
+               , z : 5
+               , y : 5
+               , x : 5
+               , w : 1;
+    };
+
     struct tr3_room_vertex
     {
         tr_vertex   vertex;
@@ -774,6 +784,10 @@ struct tr_object_texture_psx
     /// @param vertices The vertices to convert.
     /// @return The converted vertices.
     std::vector<tr3_room_vertex> convert_vertices(std::vector<tr5_room_vertex> vertices);
+
+    // Convert a set of Tomb Raider II (PSX) vertices into a vertex format compatible
+    // with Tomb Raider III (what the viewer is currently using).
+    std::vector<tr3_room_vertex> convert_vertices ( std::vector<tr2_psx_room_vertex> vertices );
 
     // Convert a set of Tomb Raider (PSX) vertices into a vertex format compatible
     // with Tomb Raider III (what the viewer is currently using).
